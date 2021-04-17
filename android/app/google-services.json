@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "159261045198",
+    "project_id": "elive-bfc34",
+    "storage_bucket": "elive-bfc34.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159261045198:android:f117ad947ad24899017b9f",
+        "android_client_info": {
+          "package_name": "com.elive.elive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159261045198-r62ia7e4nfgf56i3hoopluj5obc4bdsd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elive.elive",
+            "certificate_hash": "82d99f7360f32e60ca31a10ba5093f5e9613d059"
+          }
+        },
+        {
+          "client_id": "159261045198-e48hrb0fop7f6cm38kct300o0vttls8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAo4NWjQ7ckFAoC3ovuEkmIwkoATHZK1Ak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159261045198-e48hrb0fop7f6cm38kct300o0vttls8s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

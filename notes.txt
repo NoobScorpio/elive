@@ -1,0 +1,14 @@
+keytool -exportcert -alias key -keystore "C:\Users\CIFER\AndroidStudioProjects\elive\keys.keystore" | "C:\openssl\bin\openssl" sha1 -binary | "C:\openssl\bin\openssl" base64
+
+uIGpvmNJ9GsPTQ8448iQgGB3HbA=
+
+release
+
+
+      
+keytool -exportcert -alias androiddebugkey -keystore %HOMEPATH%\.android\debug.keystore | openssl sha1 -binary | openssl base64
+pass android
+
+QU8Ok2ra8kzDQLb+ZezN3jzvtsQ=
+
+ga0RGNYHvNM5d0SLGQfpQWAPGJ8=
