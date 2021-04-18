@@ -1,8 +1,16 @@
+import 'dart:convert';
+
+import 'package:elive/controllers/authController.dart';
 import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/screens/signUp.dart';
+import 'package:elive/screens/signUpPhone.dart';
+import 'package:elive/stateMangement/models/myUser.dart';
+import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:elive/utils/header.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -10,6 +18,11 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  Authenticate auth = Authenticate();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final phone = TextEditingController();
+  final code = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,10 +57,11 @@ class _SignInScreenState extends State<SignInScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
               child: TextField(
+                controller: email,
                 keyboardType: TextInputType.emailAddress,
                 cursorColor: Colors.black,
                 decoration: InputDecoration(
-                  hintText: 'Enter Email or Phone no',
+                  hintText: 'Enter Email',
                   border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey)),
                   focusedBorder: OutlineInputBorder(
@@ -61,6 +75,7 @@ class _SignInScreenState extends State<SignInScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
               child: TextField(
+                controller: password,
                 keyboardType: TextInputType.emailAddress,
                 cursorColor: Colors.black,
                 decoration: InputDecoration(
@@ -78,41 +93,327 @@ class _SignInScreenState extends State<SignInScreen> {
             SizedBox(
               height: 20,
             ),
-            Container(
-              width: 120,
-              height: 40,
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => BottomNavBar()));
-                  },
-                  child: Text(
-                    'Sign In',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600),
-                  )),
+            InkWell(
+              onTap: () async {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => loader());
+                Pattern pattern =
+                    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)'
+                    r'|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]'
+                    r'{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                RegExp emailRegex = new RegExp(pattern);
+                if (emailRegex
+                    .hasMatch(email.text.toString().trim().toLowerCase())) {
+                  if (password.text.length >= 6) {
+                    MyUser user = await auth.signInWithEmail(
+                        email: email.text.toLowerCase(),
+                        password: password.text);
+                    if (user == null) {
+                      showToast("Please try again", Colors.red);
+                      Navigator.pop(context);
+                    } else {
+                      await preferences.setString(sharedPrefs.user.toString(),
+                          json.encode(user.toJson()));
+                      await preferences.setBool(
+                          sharedPrefs.loggedIn.toString(), true);
+                      await preferences.setBool(
+                          sharedPrefs.emailLogIn.toString(), true);
+                      Navigator.pop(context);
+                      showToast("Success", Colors.green);
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => BlocProvider(
+                                  create: (context) => UserCubit(),
+                                  child: BottomNavBar())),
+                          (route) => false);
+                    }
+                  } else {
+                    //  PASS ELSE
+                    Navigator.pop(context);
+                    showToast("Password should have at least 6 characters",
+                        Colors.black);
+                  }
+                } else {
+                  //  EMAIL ELSE
+                  Navigator.pop(context);
+                  showToast("Enter a valid Email", Colors.black);
+                }
+              },
+              child: Container(
+                width: 240,
+                height: 50,
+                child: Card(
+                    elevation: 5,
+                    // color: Color(0xFF4267B2),
+                    color: getPrimaryColor(context),
+                    child: Center(
+                      child: Text(
+                        'Sign In',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    )),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            InkWell(
+              onTap: () async {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => loader());
+                MyUser user = await auth.signInWithGoogle();
+                if (user == null) {
+                  Navigator.pop(context);
+                  showToast("Please try again", Colors.red);
+                } else {
+                  await preferences.setString(
+                      sharedPrefs.user.toString(), json.encode(user.toJson()));
+                  await preferences.setBool(
+                      sharedPrefs.loggedIn.toString(), true);
+                  await preferences.setBool(
+                      sharedPrefs.googleLogIn.toString(), true);
+
+                  Navigator.pop(context);
+                  showToast("Success", Colors.green);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                              create: (context) => UserCubit(),
+                              child: BottomNavBar())),
+                      (route) => false);
+                }
+              },
+              child: Container(
+                width: 240,
+                height: 50,
+                child: Card(
+                    elevation: 5,
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 15,
+                            backgroundImage:
+                                AssetImage('assets/images/google.png'),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Sign in with Google',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    )),
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            InkWell(
+              onTap: () async {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (_) => AlertDialog(
+                          title: Text("Sign in with Phone"),
+                          content: Container(
+                            height: 150,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextField(
+                                  controller: phone,
+                                  keyboardType: TextInputType.number,
+                                  cursorColor: Colors.black,
+                                  decoration: InputDecoration(
+                                    prefixIcon: InkWell(
+                                        onTap: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (_) => AlertDialog(
+                                                    content: Text(
+                                                        "Please enter complete number. For example, "
+                                                        "if you are from Dubai enter number like "
+                                                        "+971xxxxxxxx"),
+                                                  ));
+                                        },
+                                        child: Icon(Icons.info_outline)),
+                                    suffixIcon: InkWell(
+                                        onTap: () async {
+                                          showDialog(
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder: (_) => loader());
+                                          await auth.verifyPhone(
+                                              number: phone.text);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Icon(Icons.send)),
+                                    hintText: 'Enter Phone No.',
+                                    border: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.grey)),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.black)),
+                                  ),
+                                  onChanged: (val) {
+                                    // username = val;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                TextField(
+                                  controller: code,
+                                  keyboardType: TextInputType.number,
+                                  cursorColor: Colors.black,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter Code',
+                                    border: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.grey)),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.black)),
+                                  ),
+                                  onChanged: (val) {
+                                    // username = val;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) => loader());
+                                MyUser user =
+                                    await auth.signInWithPhoneCredentials(
+                                  code: code.text.toString(),
+                                );
+                                if (user == null) {
+                                  Navigator.pop(context);
+                                  showToast("Please try again", Colors.red);
+                                } else {
+                                  await preferences.setString(
+                                      sharedPrefs.user.toString(),
+                                      json.encode(user.toJson()));
+                                  await preferences.setBool(
+                                      sharedPrefs.loggedIn.toString(), true);
+                                  await preferences.setBool(
+                                      sharedPrefs.phoneLogIn.toString(), true);
+                                  Navigator.pop(context);
+                                  showToast("Success", Colors.green);
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => BlocProvider(
+                                              create: (context) => UserCubit(),
+                                              child: BottomNavBar())),
+                                      (route) => false);
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Sign in",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ));
+              },
+              child: Container(
+                width: 240,
+                height: 50,
+                child: Card(
+                    elevation: 5,
+                    // color: Color(0xFF4267B2),
+                    color: Colors.black,
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.phone,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Sign in with Phone',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    )),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Text('Or'),
             ),
-            Container(
-              width: 120,
-              height: 40,
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => SignUpScreen()));
-                  },
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600),
-                  )),
+            InkWell(
+              onTap: () async {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => SignUpScreen()));
+              },
+              child: Container(
+                width: 240,
+                height: 50,
+                child: Card(
+                    elevation: 5,
+                    // color: Color(0xFF4267B2),
+                    color: getPrimaryColor(context),
+                    child: Center(
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    )),
+              ),
             ),
           ],
         ),

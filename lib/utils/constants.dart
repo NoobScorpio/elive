@@ -1,7 +1,28 @@
+import 'dart:convert';
+
+import 'package:elive/stateMangement/models/myUser.dart';
+import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 MaterialColor getPrimaryColor(context) {
   return Theme.of(context).primaryColor;
+}
+
+enum sharedPrefs {
+  firstOpen,
+  loggedIn,
+  googleLogIn,
+  phoneLogIn,
+  emailLogIn,
+  user
+}
+SharedPreferences preferences;
+Future init() async {
+  preferences = await SharedPreferences.getInstance();
 }
 
 const headerText =
@@ -86,6 +107,39 @@ Widget getServiceCard({title, image, height, width}) {
           ),
         )
       ],
+    ),
+  );
+}
+
+void showToast(String msg, Color color) {
+  Fluttertoast.showToast(
+      msg: "$msg",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: color,
+      textColor: Colors.white,
+      fontSize: 16.0);
+}
+
+Future loginUserState(context) async {
+  String userStr = preferences.getString(sharedPrefs.user.toString());
+  if (userStr == null) {
+    await BlocProvider.of<UserCubit>(context).loginUser(null);
+  } else {
+    MyUser user = MyUser.fromJson(json.decode(userStr));
+    await BlocProvider.of<UserCubit>(context).loginUser(user);
+  }
+}
+
+Widget loader() {
+  return Center(
+    child: Container(
+      height: 100,
+      child: LoadingIndicator(
+        indicatorType: Indicator.ballClipRotateMultiple,
+        color: Colors.black,
+      ),
     ),
   );
 }

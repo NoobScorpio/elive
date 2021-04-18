@@ -1,10 +1,17 @@
 import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/screens/homeScreen.dart';
 import 'package:elive/screens/onboard.dart';
+import 'package:elive/screens/signin.dart';
+import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
+import 'package:elive/utils/constants.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -17,7 +24,9 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.karlaTextTheme(),
         primarySwatch: Colors.yellow,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MultiBlocProvider(providers: [
+        BlocProvider<UserCubit>(create: (context) => UserCubit()),
+      ], child: MyHomePage(title: 'Elive')),
     );
   }
 }
@@ -30,8 +39,42 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool first = true, loggedIn = false;
+  bool isLoading = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setBool();
+  }
+
+  setBool() async {
+    await init();
+    bool firstLog = preferences.getBool(sharedPrefs.firstOpen.toString());
+    if (firstLog == null || firstLog == true) {
+      first = true;
+    } else {
+      first = false;
+    }
+    bool log = preferences.getBool(sharedPrefs.loggedIn.toString());
+    if (log == null || log == false) {
+      loggedIn = false;
+    } else {
+      loggedIn = true;
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return OnBoardScreen();
+    return Scaffold(
+      body: isLoading
+          ? loader()
+          : (first
+              ? OnBoardScreen()
+              : (loggedIn ? BottomNavBar() : SignInScreen())),
+    );
   }
 }

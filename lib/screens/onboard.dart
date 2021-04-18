@@ -1,5 +1,6 @@
 import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/screens/signin.dart';
+import 'package:elive/utils/constants.dart';
 import 'package:fancy_on_boarding/fancy_on_boarding.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,17 @@ class OnBoardScreen extends StatefulWidget {
 
 class _OnBoardScreenState extends State<OnBoardScreen> {
   //Create a list of PageModel to be set on the onBoarding Screens.
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setBool();
+  }
+
+  setBool() async {
+    await init();
+    await preferences.setBool(sharedPrefs.firstOpen.toString(), false);
+  }
 
   @override
   Widget build(BuildContext context) {

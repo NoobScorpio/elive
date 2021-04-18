@@ -12,3 +12,8 @@ pass android
 QU8Ok2ra8kzDQLb+ZezN3jzvtsQ=
 
 ga0RGNYHvNM5d0SLGQfpQWAPGJ8=
+
+
+keytoll comand
+
+keytool -list -v -keystore "C:\Users\CIFER\AndroidStudioProjects\elive\key.jks" -alias key -storepass elivekey -keypass elivekey

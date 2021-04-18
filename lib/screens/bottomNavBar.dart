@@ -1,8 +1,8 @@
 import 'package:elive/screens/cartScreen.dart';
 import 'package:elive/screens/homeScreen.dart';
 import 'package:elive/utils/constants.dart';
-import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -33,26 +33,36 @@ class _BottomNavBarState extends State<BottomNavBar> {
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: FFNavigationBar(
-        theme: FFNavigationBarTheme(
-          barBackgroundColor: Colors.black,
-          selectedItemBorderColor: getPrimaryColor(context),
-          selectedItemBackgroundColor: Colors.black,
-          selectedItemIconColor: getPrimaryColor(context),
-          selectedItemLabelColor: Colors.white,
-        ),
+      bottomNavigationBar: SnakeNavigationBar.color(
+        behaviour: SnakeBarBehaviour.pinned,
+        snakeShape: SnakeShape.indicator,
+
+        // padding: padding,
+
+        ///configuration for SnakeNavigationBar.color
+        snakeViewColor: getPrimaryColor(context),
+        backgroundColor: Colors.black,
+        selectedItemColor: getPrimaryColor(context),
+        // selectedItemColor:
+        //     snakeShape == SnakeShape.indicator ? selectedColor : null,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        showSelectedLabels: true,
         items: [
-          FFNavigationBarItem(
-            iconData: Icons.home,
-            label: 'Home',
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
           ),
-          FFNavigationBarItem(
-            iconData: Icons.shopping_cart,
-            label: 'Cart',
+
+          /// Likes
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: "Cart",
           ),
         ],
-        selectedIndex: _selectedIndex,
-        onSelectTab: _onItemTapped,
+        currentIndex: _selectedIndex,
+        // selectedIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
