@@ -23,6 +23,16 @@ class Database {
     }
   }
 
+  Future<MyUser> updateUser({MyUser user}) async {
+    try {
+      await userCollection.doc(user.uid).update(user.toJson());
+      return user;
+    } catch (e) {
+      print("GET USER EXCEPTION $e");
+      return null;
+    }
+  }
+
   Future<bool> createUser({MyUser user}) async {
     try {
       await userCollection.doc(user.uid).set(user.toJson());

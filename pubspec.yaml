@@ -47,6 +47,8 @@ dependencies:
   fluttertoast: ^8.0.4
   shared_preferences: ^2.0.5
   loading_indicator: ^2.0.1
+  images_picker: ^1.1.0
+  mailer:
 dev_dependencies:
   flutter_test:
     sdk: flutter

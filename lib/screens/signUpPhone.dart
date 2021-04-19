@@ -115,6 +115,7 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
               child: ElevatedButton(
                   onPressed: () async {
                     if (name.text.length >= 3) {
+                      showToast("Sending code", Colors.blue);
                       await auth.verifyPhone(number: phone.text);
                     } else {
                       //  NAME ELSE

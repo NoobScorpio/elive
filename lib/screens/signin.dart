@@ -255,10 +255,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                         child: Icon(Icons.info_outline)),
                                     suffixIcon: InkWell(
                                         onTap: () async {
-                                          showDialog(
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder: (_) => loader());
+                                          showToast(
+                                              "Sending code", Colors.blue);
                                           await auth.verifyPhone(
                                               number: phone.text);
                                           Navigator.pop(context);

@@ -108,13 +108,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        ProfileScreen()));
+                                                    builder: (_) => BlocProvider(
+                                                        create: (context) =>
+                                                            UserCubit(),
+                                                        child:
+                                                            ProfileScreen())));
                                           },
-                                          child: Icon(
-                                            Icons.person_pin,
-                                            color: getPrimaryColor(context),
-                                          ),
+                                          child: state.user.photoUrl == ''
+                                              ? Icon(
+                                                  Icons.person_pin,
+                                                  color:
+                                                      getPrimaryColor(context),
+                                                )
+                                              : CircleAvatar(
+                                                  backgroundColor:
+                                                      getPrimaryColor(context),
+                                                  radius: 15,
+                                                  child: CircleAvatar(
+                                                    radius: 14,
+                                                    backgroundImage:
+                                                        NetworkImage(state
+                                                            .user.photoUrl),
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                       SizedBox(
