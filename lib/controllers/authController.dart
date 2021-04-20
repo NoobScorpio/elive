@@ -131,15 +131,16 @@ class Authenticate {
       final user = authResults.user;
 
       bool find = await db.userAvailable(user.uid);
-      MyUser myUser = MyUser(
-          uid: user.uid,
-          name: user.displayName,
-          email: user.email,
-          phone: "",
-          password: "",
-          photoUrl: user.photoURL ?? "");
+
       if (!find) {
         print("User not available");
+        MyUser myUser = MyUser(
+            uid: user.uid,
+            name: user.displayName,
+            email: user.email,
+            phone: "",
+            password: "",
+            photoUrl: user.photoURL ?? "");
         bool stored = await db.createUser(user: myUser);
         if (stored) {
           return myUser;
@@ -148,7 +149,8 @@ class Authenticate {
         }
       } else {
         print("User  available");
-        return myUser;
+        MyUser usr = await db.getUser(user: user);
+        return usr;
       }
     } catch (e) {
       print("SIGN IN WITH GOOGLE EXEPTION $e");

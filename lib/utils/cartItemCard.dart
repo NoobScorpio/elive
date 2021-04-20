@@ -1,6 +1,12 @@
+import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartItemCard extends StatelessWidget {
+  final name;
+  final int qty, price;
+  const CartItemCard({Key key, this.name, this.price, this.qty})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -34,7 +40,7 @@ class CartItemCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 5),
                         child: Text(
-                          "Nails",
+                          "$name",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 18,
@@ -44,7 +50,7 @@ class CartItemCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Text(
-                          "Nails category",
+                          "$price x $qty",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
@@ -55,32 +61,45 @@ class CartItemCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Text(
-                      "Price",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () async {
+                    BlocProvider.of<CartCubit>(context).removeItem(name);
+                    print('@REMOVED');
+                  },
+                  child: Icon(
+                    Icons.cancel,
+                    color: Colors.red,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      "SAR 123",
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              )
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     Padding(
+              //       padding:
+              //           const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              //       child: Text(
+              //         "Price",
+              //         style: TextStyle(
+              //             color: Colors.black,
+              //             fontSize: 18,
+              //             fontWeight: FontWeight.w600),
+              //       ),
+              //     ),
+              //     Padding(
+              //       padding: const EdgeInsets.symmetric(horizontal: 15),
+              //       child: Text(
+              //         "SAR 123",
+              //         style: TextStyle(
+              //             color: Colors.grey,
+              //             fontSize: 14,
+              //             fontWeight: FontWeight.w600),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),

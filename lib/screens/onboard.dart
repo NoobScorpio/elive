@@ -17,7 +17,6 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
   //Create a list of PageModel to be set on the onBoarding Screens.
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setBool();
   }

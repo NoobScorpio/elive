@@ -49,6 +49,7 @@ dependencies:
   loading_indicator: ^2.0.1
   images_picker: ^1.1.0
   mailer:
+  cached_network_image: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

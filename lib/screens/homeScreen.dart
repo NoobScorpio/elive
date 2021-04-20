@@ -1,4 +1,10 @@
+import 'package:elive/controllers/apiController.dart';
+import 'package:elive/controllers/cartController.dart';
+import 'package:elive/screens/itemsScreen.dart';
 import 'package:elive/screens/profileScreen.dart';
+import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
+import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
+import 'package:elive/stateMangement/category_bloc/categoryState.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userState.dart';
 import 'package:elive/utils/constants.dart';
@@ -17,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   setUser() async {
     await init();
     await loginUserState(context);
+    await BlocProvider.of<CategoryCubit>(context).getCategory();
     setState(() {
       loading = false;
     });
@@ -123,9 +130,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               : CircleAvatar(
                                                   backgroundColor:
                                                       getPrimaryColor(context),
-                                                  radius: 15,
+                                                  radius: 20,
                                                   child: CircleAvatar(
-                                                    radius: 14,
+                                                    radius: 19,
                                                     backgroundImage:
                                                         NetworkImage(state
                                                             .user.photoUrl),
@@ -140,6 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
+                                          SizedBox(
+                                            height: 5,
+                                          ),
                                           Text(
                                             "Hello, ${state.user.name}",
                                             style: TextStyle(
@@ -227,38 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Container(
-                      height: 180,
-                      width: width,
-                      child: Swiper(
-                        itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            child: Container(
-                              // width: width * 0.422,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                                image: DecorationImage(
-                                    image: AssetImage(images[index]),
-                                    fit: BoxFit.cover),
-                              ),
-                            ),
-                          );
-                        },
-                        itemCount: images.length,
-                        viewportFraction: 0.70,
-                        scale: 0.75,
-                      ),
-                    ),
-                  ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 10),
@@ -267,57 +246,104 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: headerText,
                     ),
                   ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        getCard(
-                            title: "Waxing",
-                            image: 'assets/images/wax.jpg',
-                            width: width),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        getCard(
-                            title: "Nails",
-                            image: 'assets/images/nails.jpg',
-                            width: width),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        getCard(
-                            title: "Flare",
-                            image: 'assets/images/flare.jpg',
-                            width: width),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        getCard(
-                            title: "Henna",
-                            image: 'assets/images/henna.jpg',
-                            width: width),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Center(
-                      child: getCard(
-                          title: "Threading",
-                          image: 'assets/images/thread.jpg',
-                          special: true,
-                          width: width),
-                    ),
-                  ),
+                  BlocBuilder<CategoryCubit, CategoryState>(
+                      builder: (context, state) {
+                    if (state is CategoryInitialState) {
+                      return Text(
+                        "Loading...",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      );
+                    } else if (state is CategoryLoadingState) {
+                      return Text(
+                        "Loading...",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      );
+                    } else if (state is CategoryLoadedState) {
+                      if (state.category == null) {
+                        return Text(
+                          "Loading...",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400),
+                        );
+                      } else {
+                        List<Widget> widgets = [];
+                        for (int i = 0;
+                            i < state.category.records.length;
+                            i++) {
+                          widgets.add(InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => BlocProvider<CartCubit>(
+                                            create: (context) => CartCubit(
+                                                cartRepository:
+                                                    CartRepositoryImpl()),
+                                            child: ItemsScreen(
+                                              width: width,
+                                              cid: int.parse(state.category
+                                                  .records[i].packageId),
+                                              category: state
+                                                  .category.records[i].pname,
+                                              image: "$imageURL" +
+                                                  "/" +
+                                                  "${state.category.records[i].packagePic}",
+                                            ),
+                                          )));
+                            },
+                            child: getCard(
+                                title: "${state.category.records[i].pname}",
+                                image: "$imageURL" +
+                                    "/" +
+                                    "${state.category.records[i].packagePic}",
+                                width: width),
+                          ));
+                          print(state.category.records[i].packagePic);
+                        }
+                        return GridView.builder(
+                          itemCount: widgets.length,
+                          padding: const EdgeInsets.all(15),
+                          gridDelegate:
+                              new SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: width < 390
+                                ? (height < 750 ? 2 / 3.1 : 2 / 3.0)
+                                : 2 / 2.4,
+                          ),
+                          itemBuilder: (context, index) => widgets[index],
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                        );
+                      }
+                    } else if (state is CategoryErrorState) {
+                      return Text(
+                        "Loading...",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      );
+                    } else {
+                      return Text(
+                        "User not loaded",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      );
+                    }
+                  }),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 10),

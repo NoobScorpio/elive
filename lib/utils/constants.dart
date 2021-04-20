@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,11 @@ import 'package:loading_indicator/loading_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 MaterialColor getPrimaryColor(context) {
-  return Theme.of(context).primaryColor;
+  return Colors.red;
 }
 
+const baseURL = 'https://elivebeautyspot.in/admin/api/package';
+const imageURL = 'https://elivebeautyspot.in/admin/upload/imagenamehere';
 enum sharedPrefs {
   firstOpen,
   loggedIn,
@@ -33,6 +36,7 @@ const cardText = TextStyle(
 
 Widget getCard({title, image, height, width, special}) {
   return Card(
+    color: Colors.black,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(15)),
     ),
@@ -40,13 +44,61 @@ Widget getCard({title, image, height, width, special}) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // CachedNetworkImage(
+        //   imageUrl: image,
+        //   imageBuilder: (context, image) => Container(
+        //     width: special == null ? width * 0.422 : width * 0.9,
+        //     height: special == null ? 175 : 145,
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.only(
+        //           topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+        //       image: DecorationImage(image: image, fit: BoxFit.cover),
+        //     ),
+        //   ),
+        //   progressIndicatorBuilder: (context, img, progress) => Container(
+        //     width: special == null ? width * 0.422 : width * 0.9,
+        //     height: special == null ? 175 : 145,
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.only(
+        //           topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+        //     ),
+        //     child: Container(
+        //       height: 50,
+        //       width: 50,
+        //       child: Center(
+        //         child: CircularProgressIndicator(
+        //           value: progress.progress,
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        //   errorWidget: (context, img, err) => Container(
+        //     width: special == null ? width * 0.422 : width * 0.9,
+        //     height: special == null ? 175 : 145,
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.only(
+        //           topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+        //     ),
+        //     child: Center(
+        //       child: Icon(
+        //         Icons.error_outline,
+        //         color: Colors.red,
+        //       ),
+        //     ),
+        //   ),
+        // ),
         Container(
           width: special == null ? width * 0.422 : width * 0.9,
           height: special == null ? 175 : 145,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-            image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
           ),
         ),
         Container(

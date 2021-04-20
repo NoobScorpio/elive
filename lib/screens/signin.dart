@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:elive/controllers/authController.dart';
+import 'package:elive/controllers/cartController.dart';
 import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/screens/signUp.dart';
-import 'package:elive/screens/signUpPhone.dart';
+import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
+import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
@@ -125,9 +127,17 @@ class _SignInScreenState extends State<SignInScreen> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => BlocProvider(
-                                  create: (context) => UserCubit(),
-                                  child: BottomNavBar())),
+                              builder: (_) => MultiBlocProvider(providers: [
+                                    BlocProvider<UserCubit>(
+                                      create: (context) => UserCubit(),
+                                    ),
+                                    BlocProvider<CategoryCubit>(
+                                        create: (context) => CategoryCubit()),
+                                    BlocProvider<CartCubit>(
+                                        create: (context) => CartCubit(
+                                            cartRepository:
+                                                CartRepositoryImpl())),
+                                  ], child: BottomNavBar())),
                           (route) => false);
                     }
                   } else {
@@ -186,9 +196,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => BlocProvider(
-                              create: (context) => UserCubit(),
-                              child: BottomNavBar())),
+                          builder: (_) => MultiBlocProvider(providers: [
+                                BlocProvider<UserCubit>(
+                                  create: (context) => UserCubit(),
+                                ),
+                                BlocProvider<CategoryCubit>(
+                                    create: (context) => CategoryCubit()),
+                                BlocProvider<CartCubit>(
+                                    create: (context) => CartCubit(
+                                        cartRepository: CartRepositoryImpl())),
+                              ], child: BottomNavBar())),
                       (route) => false);
                 }
               },
@@ -337,9 +354,20 @@ class _SignInScreenState extends State<SignInScreen> {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (_) => BlocProvider(
-                                              create: (context) => UserCubit(),
-                                              child: BottomNavBar())),
+                                          builder: (_) =>
+                                              MultiBlocProvider(providers: [
+                                                BlocProvider<UserCubit>(
+                                                  create: (context) =>
+                                                      UserCubit(),
+                                                ),
+                                                BlocProvider<CategoryCubit>(
+                                                    create: (context) =>
+                                                        CategoryCubit()),
+                                                BlocProvider<CartCubit>(
+                                                    create: (context) => CartCubit(
+                                                        cartRepository:
+                                                            CartRepositoryImpl())),
+                                              ], child: BottomNavBar())),
                                       (route) => false);
                                 }
                               },

@@ -1,7 +1,10 @@
+import 'package:elive/controllers/cartController.dart';
 import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/screens/homeScreen.dart';
 import 'package:elive/screens/onboard.dart';
 import 'package:elive/screens/signin.dart';
+import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
+import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,10 +25,14 @@ class MyApp extends StatelessWidget {
       title: 'Elive',
       theme: ThemeData(
         textTheme: GoogleFonts.karlaTextTheme(),
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.red,
       ),
       home: MultiBlocProvider(providers: [
         BlocProvider<UserCubit>(create: (context) => UserCubit()),
+        BlocProvider<CategoryCubit>(create: (context) => CategoryCubit()),
+        BlocProvider<CartCubit>(
+            create: (context) =>
+                CartCubit(cartRepository: CartRepositoryImpl())),
       ], child: MyHomePage(title: 'Elive')),
     );
   }
@@ -43,7 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isLoading = true;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setBool();
   }

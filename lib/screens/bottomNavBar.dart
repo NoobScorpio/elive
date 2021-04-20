@@ -1,7 +1,10 @@
 import 'package:elive/screens/cartScreen.dart';
 import 'package:elive/screens/homeScreen.dart';
+import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
+import 'package:elive/stateMangement/models/cart.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -18,6 +21,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     });
   }
 
+  List<CartItem> cartItems;
   @override
   void initState() {
     super.initState();

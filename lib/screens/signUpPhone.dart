@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:elive/controllers/authController.dart';
 import 'package:elive/screens/bottomNavBar.dart';
+import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
@@ -181,9 +182,13 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => BlocProvider(
+                              builder: (_) => MultiBlocProvider(providers: [
+                                BlocProvider<UserCubit>(
                                   create: (context) => UserCubit(),
-                                  child: BottomNavBar())),
+                                ),
+                                BlocProvider<CategoryCubit>(
+                                    create: (context) => CategoryCubit()),
+                              ], child: BottomNavBar())),
                           (route) => false);
                     }
                   },
