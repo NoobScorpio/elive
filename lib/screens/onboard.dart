@@ -23,7 +23,7 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
 
   setBool() async {
     await init();
-    await preferences.setBool(sharedPrefs.firstOpen.toString(), false);
+    await preferences.setBool(SPS.firstOpen.toString(), false);
   }
 
   @override

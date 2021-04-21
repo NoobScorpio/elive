@@ -116,12 +116,11 @@ class _SignInScreenState extends State<SignInScreen> {
                       showToast("Please try again", Colors.red);
                       Navigator.pop(context);
                     } else {
-                      await preferences.setString(sharedPrefs.user.toString(),
-                          json.encode(user.toJson()));
+                      await preferences.setString(
+                          SPS.user.toString(), json.encode(user.toJson()));
+                      await preferences.setBool(SPS.loggedIn.toString(), true);
                       await preferences.setBool(
-                          sharedPrefs.loggedIn.toString(), true);
-                      await preferences.setBool(
-                          sharedPrefs.emailLogIn.toString(), true);
+                          SPS.emailLogIn.toString(), true);
                       Navigator.pop(context);
                       showToast("Success", Colors.green);
                       Navigator.pushAndRemoveUntil(
@@ -185,11 +184,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   showToast("Please try again", Colors.red);
                 } else {
                   await preferences.setString(
-                      sharedPrefs.user.toString(), json.encode(user.toJson()));
-                  await preferences.setBool(
-                      sharedPrefs.loggedIn.toString(), true);
-                  await preferences.setBool(
-                      sharedPrefs.googleLogIn.toString(), true);
+                      SPS.user.toString(), json.encode(user.toJson()));
+                  await preferences.setBool(SPS.loggedIn.toString(), true);
+                  await preferences.setBool(SPS.googleLogIn.toString(), true);
 
                   Navigator.pop(context);
                   showToast("Success", Colors.green);
@@ -343,12 +340,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                   showToast("Please try again", Colors.red);
                                 } else {
                                   await preferences.setString(
-                                      sharedPrefs.user.toString(),
+                                      SPS.user.toString(),
                                       json.encode(user.toJson()));
                                   await preferences.setBool(
-                                      sharedPrefs.loggedIn.toString(), true);
+                                      SPS.loggedIn.toString(), true);
                                   await preferences.setBool(
-                                      sharedPrefs.phoneLogIn.toString(), true);
+                                      SPS.phoneLogIn.toString(), true);
                                   Navigator.pop(context);
                                   showToast("Success", Colors.green);
                                   Navigator.pushAndRemoveUntil(

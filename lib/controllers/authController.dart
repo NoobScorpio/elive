@@ -32,17 +32,17 @@ class Authenticate {
 
   Future signOut(context) async {
     await init();
-    await preferences.setBool(sharedPrefs.emailLogIn.toString(), false);
-    await preferences.setBool(sharedPrefs.googleLogIn.toString(), false);
-    await preferences.setBool(sharedPrefs.phoneLogIn.toString(), false);
-    await preferences.setBool(sharedPrefs.loggedIn.toString(), false);
-    await preferences.setString(sharedPrefs.user.toString(), "");
+    await preferences.setBool(SPS.emailLogIn.toString(), false);
+    await preferences.setBool(SPS.googleLogIn.toString(), false);
+    await preferences.setBool(SPS.phoneLogIn.toString(), false);
+    await preferences.setBool(SPS.loggedIn.toString(), false);
+    await preferences.setString(SPS.user.toString(), "");
     // await BlocProvider.of<UserCubit>(context).logOut();
     await auth.signOut();
   }
 
   Future<MyUser> signUpWithPhoneCredentials(
-      {code, phoneVerificationID, name}) async {
+      {code, phoneVerificationID, name, dob}) async {
     try {
       PhoneAuthCredential cred = PhoneAuthProvider.credential(
           verificationId: phoneVerificationID, smsCode: code);
@@ -59,6 +59,7 @@ class Authenticate {
               name: name,
               email: "",
               phone: user.phoneNumber,
+              dob: dob,
               password: "",
               photoUrl: user.photoURL ?? "");
           bool stored = await db.createUser(user: myUser);
@@ -140,6 +141,7 @@ class Authenticate {
             email: user.email,
             phone: "",
             password: "",
+            dob: "",
             photoUrl: user.photoURL ?? "");
         bool stored = await db.createUser(user: myUser);
         if (stored) {
@@ -175,7 +177,7 @@ class Authenticate {
     }
   }
 
-  Future signUpWithEmail({name, email, password}) async {
+  Future signUpWithEmail({name, email, password, dob}) async {
     try {
       UserCredential result = await auth.createUserWithEmailAndPassword(
           email: email.trim().trimRight().trimLeft(), password: password);
@@ -185,6 +187,7 @@ class Authenticate {
           name: name,
           email: email,
           phone: "",
+          dob: dob,
           password: password,
           photoUrl: "");
       bool saved = await db.createUser(user: myUser);

@@ -14,14 +14,15 @@ MaterialColor getPrimaryColor(context) {
 }
 
 const baseURL = 'https://elivebeautyspot.in/admin/api/package';
-const imageURL = 'https://elivebeautyspot.in/admin/upload/imagenamehere';
-enum sharedPrefs {
+const imageURL = 'https://elivebeautyspot.in/admin/upload';
+enum SPS {
   firstOpen,
   loggedIn,
   googleLogIn,
   phoneLogIn,
   emailLogIn,
-  user
+  user,
+  promo
 }
 SharedPreferences preferences;
 Future init() async {
@@ -44,63 +45,63 @@ Widget getCard({title, image, height, width, special}) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // CachedNetworkImage(
-        //   imageUrl: image,
-        //   imageBuilder: (context, image) => Container(
-        //     width: special == null ? width * 0.422 : width * 0.9,
-        //     height: special == null ? 175 : 145,
-        //     decoration: BoxDecoration(
-        //       borderRadius: BorderRadius.only(
-        //           topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-        //       image: DecorationImage(image: image, fit: BoxFit.cover),
-        //     ),
-        //   ),
-        //   progressIndicatorBuilder: (context, img, progress) => Container(
-        //     width: special == null ? width * 0.422 : width * 0.9,
-        //     height: special == null ? 175 : 145,
-        //     decoration: BoxDecoration(
-        //       borderRadius: BorderRadius.only(
-        //           topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-        //     ),
-        //     child: Container(
-        //       height: 50,
-        //       width: 50,
-        //       child: Center(
-        //         child: CircularProgressIndicator(
-        //           value: progress.progress,
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        //   errorWidget: (context, img, err) => Container(
-        //     width: special == null ? width * 0.422 : width * 0.9,
-        //     height: special == null ? 175 : 145,
-        //     decoration: BoxDecoration(
-        //       borderRadius: BorderRadius.only(
-        //           topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-        //     ),
-        //     child: Center(
-        //       child: Icon(
-        //         Icons.error_outline,
-        //         color: Colors.red,
-        //       ),
-        //     ),
-        //   ),
-        // ),
-        Container(
-          width: special == null ? width * 0.422 : width * 0.9,
-          height: special == null ? 175 : 145,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+        CachedNetworkImage(
+          imageUrl: image,
+          imageBuilder: (context, image) => Container(
+            width: special == null ? width * 0.45 : width * 0.9,
+            height: special == null ? 175 : 145,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+              image: DecorationImage(image: image, fit: BoxFit.cover),
+            ),
           ),
-          child: Center(
-            child: Icon(
-              Icons.error_outline,
-              color: Colors.red,
+          progressIndicatorBuilder: (context, img, progress) => Container(
+            width: special == null ? width * 0.422 : width * 0.9,
+            height: special == null ? 175 : 145,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+            ),
+            child: Container(
+              height: 50,
+              width: 50,
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: progress.progress,
+                ),
+              ),
+            ),
+          ),
+          errorWidget: (context, img, err) => Container(
+            width: special == null ? width * 0.422 : width * 0.9,
+            height: special == null ? 175 : 145,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+            ),
+            child: Center(
+              child: Icon(
+                Icons.error_outline,
+                color: Colors.red,
+              ),
             ),
           ),
         ),
+        // Container(
+        //   width: special == null ? width * 0.422 : width * 0.9,
+        //   height: special == null ? 175 : 145,
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.only(
+        //         topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+        //   ),
+        //   child: Center(
+        //     child: Icon(
+        //       Icons.error_outline,
+        //       color: Colors.red,
+        //     ),
+        //   ),
+        // ),
         Container(
           width: special == null ? width * 0.422 : width * 0.9,
           decoration: BoxDecoration(
@@ -175,7 +176,7 @@ void showToast(String msg, Color color) {
 }
 
 Future loginUserState(context) async {
-  String userStr = preferences.getString(sharedPrefs.user.toString());
+  String userStr = preferences.getString(SPS.user.toString());
   if (userStr == null) {
     await BlocProvider.of<UserCubit>(context).loginUser(null);
   } else {

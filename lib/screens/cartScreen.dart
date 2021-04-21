@@ -1,3 +1,4 @@
+import 'package:elive/screens/checkoutScreen.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/cart_bloc/cartState.dart';
 import 'package:elive/stateMangement/models/cart.dart';
@@ -93,18 +94,18 @@ class _CartScreenState extends State<CartScreen> {
                 } else {
                   // List<Widget> cartItemWidgets = [];
                   qty = 0;
-                  // Map<String, int> names = {};
-                  // Map<String, int> prices = {};
-                  // for (var item in cartItems) {
-                  //   qty++;
-                  //   price += int.parse(item.price);
-                  //   if (!names.containsKey(item.pName)) {
-                  //     names[item.pName] = 1;
-                  //     prices[item.pName] = int.parse(item.price);
-                  //   } else {
-                  //     names[item.pName] += 1;
-                  //   }
-                  // }
+                  Map<String, int> names = {};
+                  Map<String, int> prices = {};
+                  for (var item in state.cartItems) {
+                    qty++;
+                    price += int.parse(item.price);
+                    if (!names.containsKey(item.pName)) {
+                      names[item.pName] = 1;
+                      prices[item.pName] = int.parse(item.price);
+                    } else {
+                      names[item.pName] += 1;
+                    }
+                  }
                   // print('@ITEMS $names');
                   cartItemWidgets = [
                     Header(title: "Cart"),
@@ -126,16 +127,11 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ),
                   ];
-                  // for (var item in names.keys) {
-                  //   cartItemWidgets.add(CartItemCard(
-                  //     name: item,
-                  //     price: prices[item],
-                  //     qty: names[item],
-                  //   ));
-                  // }
+
                   for (var item in state.cartItems) {
                     cartItemWidgets.add(CartItemCard(
                       name: item.pName,
+                      image: item.img,
                       price: int.parse(item.price),
                       qty: item.qty,
                     ));
@@ -151,7 +147,36 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ));
                   cartItemWidgets.add(ElevatedButton(
-                      onPressed: () {}, child: Text('Proceed to Checkout')));
+                      onPressed: () async {
+                        String description = '';
+
+                        for (var item in names.keys) {
+                          description += "${names[item]}x $item <br>";
+                          cartItemWidgets.add(CartItemCard(
+                            name: item,
+                            price: prices[item],
+                            qty: names[item],
+                          ));
+                        }
+                        print(description);
+                        bool booked = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => BlocProvider(
+                                      create: (context) => CartCubit(),
+                                      child: CheckOutScreen(
+                                          desc: description,
+                                          names: names,
+                                          total: state.total),
+                                    )));
+                        if (booked != null) {
+                          setState(() {});
+                        }
+                      },
+                      child: Text(
+                        'Proceed to Checkout',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      )));
                   cartItemWidgets.add(SizedBox(
                     height: 15,
                   ));

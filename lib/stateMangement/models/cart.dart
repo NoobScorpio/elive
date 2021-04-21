@@ -3,10 +3,18 @@ class CartItem {
   int pid;
   String pName;
   String name;
+  String img;
   String price;
   int qty;
 
-  CartItem({this.qty, this.id, this.pName, this.pid, this.price, this.name});
+  CartItem(
+      {this.img,
+      this.qty,
+      this.id,
+      this.pName,
+      this.pid,
+      this.price,
+      this.name});
 
   CartItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -15,6 +23,7 @@ class CartItem {
     price = json['price'];
     name = json['name'];
     qty = json['qty'];
+    img = json['img'];
   }
 
   Map<String, dynamic> toJson() {
@@ -26,6 +35,7 @@ class CartItem {
     data['price'] = this.price;
     data['name'] = this.name;
     data['qty'] = this.qty;
+    data['img'] = this.img;
     return data;
   }
 

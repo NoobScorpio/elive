@@ -22,6 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final nameCont = TextEditingController();
   final emailCont = TextEditingController();
   final passwordCont = TextEditingController();
+  final dob = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +115,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              child: TextField(
+                controller: dob,
+                keyboardType: TextInputType.emailAddress,
+                cursorColor: Colors.black,
+                decoration: InputDecoration(
+                  hintText: 'DOB (YYYY-MM-DD)',
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black)),
+                ),
+                onChanged: (val) {
+                  // username = val;
+                },
+              ),
+            ),
             SizedBox(
               height: 20,
             ),
@@ -132,34 +151,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     .hasMatch(emailCont.text.toString().trim().toLowerCase())) {
                   if (passwordCont.text.length >= 6) {
                     if (nameCont.text.length >= 3) {
-                      MyUser user = await auth.signUpWithEmail(
-                          email: emailCont.text.toString(),
-                          name: nameCont.text.toString(),
-                          password: passwordCont.text.toString());
-
-                      if (user == null) {
-                        Navigator.pop(context);
-                        showToast("Please try again", Colors.red);
+                      if (dob.text == '' || dob.text == null) {
+                        showToast("Enter DOB", Colors.black);
                       } else {
-                        await preferences.setString(sharedPrefs.user.toString(),
-                            json.encode(user.toJson()));
-                        await preferences.setBool(
-                            sharedPrefs.loggedIn.toString(), true);
-                        await preferences.setBool(
-                            sharedPrefs.emailLogIn.toString(), true);
-                        Navigator.pop(context);
-                        showToast("User Created Successfully", Colors.green);
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => MultiBlocProvider(providers: [
-                                      BlocProvider<UserCubit>(
-                                        create: (context) => UserCubit(),
-                                      ),
-                                      BlocProvider<CategoryCubit>(
-                                          create: (context) => CategoryCubit()),
-                                    ], child: BottomNavBar())),
-                            (route) => false);
+                        MyUser user = await auth.signUpWithEmail(
+                            dob: dob.text,
+                            email: emailCont.text.toString(),
+                            name: nameCont.text.toString(),
+                            password: passwordCont.text.toString());
+
+                        if (user == null) {
+                          Navigator.pop(context);
+                          showToast("Please try again", Colors.red);
+                        } else {
+                          await preferences.setString(
+                              SPS.user.toString(), json.encode(user.toJson()));
+                          await preferences.setBool(
+                              SPS.loggedIn.toString(), true);
+                          await preferences.setBool(
+                              SPS.emailLogIn.toString(), true);
+                          Navigator.pop(context);
+                          showToast("User Created Successfully", Colors.green);
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => MultiBlocProvider(providers: [
+                                        BlocProvider<UserCubit>(
+                                          create: (context) => UserCubit(),
+                                        ),
+                                        BlocProvider<CategoryCubit>(
+                                            create: (context) =>
+                                                CategoryCubit()),
+                                      ], child: BottomNavBar())),
+                              (route) => false);
+                        }
                       }
                     } else {
                       //  NAME ELSE

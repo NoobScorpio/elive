@@ -31,11 +31,13 @@ class _EditProfileState extends State<EditProfile> {
       {this.googleLogin, this.emailLogin, this.phoneLogin, this.user});
   final name = TextEditingController();
   final pass = TextEditingController();
+  final dob = TextEditingController();
   MyUser user;
   setUser() async {
     await init();
     name.text = user.name;
     pass.text = user.password;
+    dob.text = user.dob;
     await loginUserState(context);
   }
 
@@ -137,8 +139,7 @@ class _EditProfileState extends State<EditProfile> {
                                       user.photoUrl = value;
 
                                       await init();
-                                      preferences.setString(
-                                          sharedPrefs.user.toString(),
+                                      preferences.setString(SPS.user.toString(),
                                           json.encode(user.toJson()));
                                       await Database().updateUser(user: user);
                                       await loginUserState(context);
@@ -183,8 +184,7 @@ class _EditProfileState extends State<EditProfile> {
                                 if (name.text.length >= 3) {
                                   user.name = name.text;
                                   await init();
-                                  preferences.setString(
-                                      sharedPrefs.user.toString(),
+                                  preferences.setString(SPS.user.toString(),
                                       json.encode(user.toJson()));
                                   await Database().updateUser(user: user);
                                   await loginUserState(context);
@@ -202,6 +202,48 @@ class _EditProfileState extends State<EditProfile> {
                                 color: Colors.black,
                               )),
                           hintText: 'Enter name',
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black)),
+                        ),
+                        onChanged: (val) {
+                          // username = val;
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: dob,
+                        keyboardType: TextInputType.name,
+                        cursorColor: Colors.black,
+                        decoration: InputDecoration(
+                          suffixIcon: InkWell(
+                              onTap: () async {
+                                showDialog(
+                                    context: context, builder: (_) => loader());
+                                if (dob.text != "Not Set") {
+                                  user.dob = dob.text;
+                                  await init();
+                                  preferences.setString(SPS.user.toString(),
+                                      json.encode(user.toJson()));
+                                  await Database().updateUser(user: user);
+                                  await loginUserState(context);
+
+                                  Navigator.pop(context);
+                                  showToast("Saved", Colors.green);
+                                } else {
+                                  showToast(
+                                      "Name should have at least 3 characters",
+                                      Colors.red);
+                                }
+                              },
+                              child: Icon(
+                                Icons.save,
+                                color: Colors.black,
+                              )),
+                          hintText: 'DOB (YYYY-MM-DDs)',
                           border: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.grey)),
                           focusedBorder: OutlineInputBorder(

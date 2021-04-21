@@ -1,5 +1,6 @@
 import 'package:elive/controllers/apiController.dart';
 import 'package:elive/controllers/cartController.dart';
+import 'package:elive/controllers/notificationController.dart';
 import 'package:elive/screens/itemsScreen.dart';
 import 'package:elive/screens/profileScreen.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
@@ -19,7 +20,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool loading = true;
-
+  List<String> services = ["Home", "Saloon"];
+  String serviceSelected = "Home";
+  final notification = NotificationController();
   setUser() async {
     await init();
     await loginUserState(context);
@@ -103,71 +106,82 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.w400),
                                   );
                                 } else {
-                                  return Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 5.0),
-                                        child: InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (_) => BlocProvider(
-                                                        create: (context) =>
-                                                            UserCubit(),
-                                                        child:
-                                                            ProfileScreen())));
-                                          },
-                                          child: state.user.photoUrl == ''
-                                              ? Icon(
-                                                  Icons.person_pin,
-                                                  color:
-                                                      getPrimaryColor(context),
-                                                )
-                                              : CircleAvatar(
-                                                  backgroundColor:
-                                                      getPrimaryColor(context),
-                                                  radius: 20,
-                                                  child: CircleAvatar(
-                                                    radius: 19,
-                                                    backgroundImage:
-                                                        NetworkImage(state
-                                                            .user.photoUrl),
+                                  try {
+                                    notification.registerNotification(
+                                        user: state.user);
+                                    return Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5.0),
+                                          child: InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (_) => BlocProvider(
+                                                          create: (context) =>
+                                                              UserCubit(),
+                                                          child:
+                                                              ProfileScreen())));
+                                            },
+                                            child: state.user.photoUrl == ''
+                                                ? Icon(
+                                                    Icons.person_pin,
+                                                    color: getPrimaryColor(
+                                                        context),
+                                                  )
+                                                : CircleAvatar(
+                                                    backgroundColor:
+                                                        getPrimaryColor(
+                                                            context),
+                                                    radius: 20,
+                                                    child: CircleAvatar(
+                                                      radius: 19,
+                                                      backgroundImage:
+                                                          NetworkImage(state
+                                                              .user.photoUrl),
+                                                    ),
                                                   ),
-                                                ),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: 15,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            "Hello, ${state.user.name}",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          Text(
-                                            "Book what you love",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w300),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
+                                        SizedBox(
+                                          width: 15,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              "Hello, ${state.user.name}",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            Text(
+                                              "Book what you love",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w300),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  } catch (e) {
+                                    print(e);
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text("Could not load"),
+                                    );
+                                  }
                                 }
                               } else if (state is UserErrorState) {
                                 return Text(
@@ -213,31 +227,50 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 10),
                     child: Text(
-                      "Services",
+                      "Select Services",
                       style: headerText,
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        getServiceCard(
-                            title: "Saloon Services",
-                            image: 'assets/images/saloon.jpg',
-                            width: width),
-                        SizedBox(
-                          width: 10,
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: double.maxFinite,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.red,
+                          ),
+                          iconSize: 42,
+                          value: serviceSelected,
+                          focusColor: Colors.red,
+                          items: services.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  '$value',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (_) {
+                            setState(() {
+                              serviceSelected = _;
+                              print(serviceSelected);
+                            });
+                          },
                         ),
-                        getServiceCard(
-                            title: "Home Services",
-                            image: 'assets/images/home.png',
-                            width: width),
-                      ],
+                      ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 10),
@@ -343,37 +376,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     }
                   }),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    child: Text(
-                      "Specials",
-                      style: headerText,
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Center(
-                      child: getCard(
-                          title: "Hair Styling",
-                          image: 'assets/images/hairstyle.jpg',
-                          special: true,
-                          width: width),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    child: Center(
-                      child: getCard(
-                          title: "Keratin Treatment",
-                          image: 'assets/images/keratin.jpeg',
-                          special: true,
-                          width: width),
-                    ),
-                  ),
                   SizedBox(
                     height: 15,
                   ),

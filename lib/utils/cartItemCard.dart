@@ -5,7 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class CartItemCard extends StatelessWidget {
   final name;
   final int qty, price;
-  const CartItemCard({Key key, this.name, this.price, this.qty})
+  final image;
+  const CartItemCard({Key key, this.name, this.price, this.qty, this.image})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class CartItemCard extends StatelessWidget {
                     radius: 25,
                     child: CircleAvatar(
                       radius: 24,
-                      backgroundImage: AssetImage('assets/images/nails.jpg'),
+                      backgroundImage: NetworkImage(image),
                     ),
                   ),
                   Column(

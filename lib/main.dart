@@ -56,13 +56,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   setBool() async {
     await init();
-    bool firstLog = preferences.getBool(sharedPrefs.firstOpen.toString());
+    bool firstLog = preferences.getBool(SPS.firstOpen.toString());
     if (firstLog == null || firstLog == true) {
       first = true;
     } else {
       first = false;
     }
-    bool log = preferences.getBool(sharedPrefs.loggedIn.toString());
+    bool log = preferences.getBool(SPS.loggedIn.toString());
     if (log == null || log == false) {
       loggedIn = false;
     } else {

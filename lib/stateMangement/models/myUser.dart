@@ -5,12 +5,15 @@ class MyUser {
   String phone;
   String name;
   String photoUrl;
-
+  String dob;
+  String pushToken;
   MyUser(
       {this.uid,
       this.email,
+      this.dob,
       this.password,
       this.phone,
+      this.pushToken,
       this.name,
       this.photoUrl});
 
@@ -21,6 +24,8 @@ class MyUser {
     phone = json['phone'];
     name = json['name'];
     photoUrl = json['photoUrl'];
+    dob = json['dob'];
+    pushToken = json['pushToken'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +36,8 @@ class MyUser {
     data['phone'] = this.phone;
     data['name'] = this.name;
     data['photoUrl'] = this.photoUrl;
+    data['dob'] = this.dob;
+    data['pushToken'] = this.pushToken;
     return data;
   }
 }

@@ -35,9 +35,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   setBool() async {
     await init();
-    bool email = preferences.getBool(sharedPrefs.emailLogIn.toString());
-    bool google = preferences.getBool(sharedPrefs.googleLogIn.toString());
-    bool phone = preferences.getBool(sharedPrefs.phoneLogIn.toString());
+    bool email = preferences.getBool(SPS.emailLogIn.toString());
+    bool google = preferences.getBool(SPS.googleLogIn.toString());
+    bool phone = preferences.getBool(SPS.phoneLogIn.toString());
     if (email == null || email == false) {
       emailLogin = false;
     } else
@@ -268,6 +268,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                             ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.celebration,
+                                      size: 20,
+                                      color: Colors.pink,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "DOB",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text("${state.user.dob ?? "N/A"}",
+                                    style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500))
+                              ],
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8.0, vertical: 2),
