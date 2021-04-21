@@ -50,8 +50,8 @@ dependencies:
   images_picker: ^1.1.0
   mailer:
   cached_network_image: ^3.0.0
-  firebase_messaging: ^9.0.0
   flutter_local_notifications: ^5.0.0-nullsafety.1
+  rxdart: ^0.26.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

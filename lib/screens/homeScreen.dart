@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool loading = true;
   List<String> services = ["Home", "Saloon"];
   String serviceSelected = "Home";
-  final notification = NotificationController();
   setUser() async {
     await init();
     await loginUserState(context);
@@ -107,8 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   );
                                 } else {
                                   try {
-                                    notification.registerNotification(
-                                        user: state.user);
                                     return Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,

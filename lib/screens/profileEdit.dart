@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:elive/controllers/databaseController.dart';
+import 'package:elive/controllers/notificationController.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userState.dart';
@@ -46,6 +47,16 @@ class _EditProfileState extends State<EditProfile> {
     // TODO: implement initState
     super.initState();
     setUser();
+    controller.setOnNotificationReceive(onNotificationReceive);
+    controller.setOnNotificationClick(onNotificationClick);
+  }
+
+  onNotificationReceive(ReceiveNotification noti) {
+    print("NOTIFICATION ID: ${noti.id}");
+  }
+
+  onNotificationClick(String payload) {
+    print("PAYLOAD $payload");
   }
 
   @override
@@ -232,6 +243,15 @@ class _EditProfileState extends State<EditProfile> {
                                   await loginUserState(context);
 
                                   Navigator.pop(context);
+                                  List<String> dobList = dob.text.split("-");
+                                  await controller.showScheduleNotification(
+                                      'Happy Birthday',
+                                      'Elive Wishes you a very happy birthday',
+                                      dateTime: DateTime(
+                                        int.parse(dobList[0]),
+                                        int.parse(dobList[1]),
+                                        int.parse(dobList[2]),
+                                      ));
                                   showToast("Saved", Colors.green);
                                 } else {
                                   showToast(

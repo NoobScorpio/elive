@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elive/controllers/apiController.dart';
+import 'package:elive/controllers/notificationController.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/models/booking.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
@@ -30,6 +31,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   bool promoBool = false;
   double promoPrice = 0.0;
   DateTime date = DateTime.now();
+  DateTime selectedDate;
+  TimeOfDay selectedTime;
   final promo = TextEditingController();
   @override
   void initState() {
@@ -37,6 +40,16 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     super.initState();
     names = widget.names;
     total = widget.total;
+    controller.setOnNotificationReceive(onNotificationReceive);
+    controller.setOnNotificationClick(onNotificationClick);
+  }
+
+  onNotificationReceive(ReceiveNotification noti) {
+    print("NOTIFICATION ID: ${noti.id}");
+  }
+
+  onNotificationClick(String payload) {
+    print("PAYLOAD $payload");
   }
 
   @override
@@ -112,7 +125,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       firstDate: DateTime.now(),
                       initialDate: DateTime.now(),
                       lastDate: DateTime(2030, 1, 1));
-
+                  selectedDate = date;
                   setState(() {
                     _date = date.toString().split(' ')[0];
                   });
@@ -163,6 +176,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 onPressed: () async {
                   TimeOfDay time = await showTimePicker(
                       context: context, initialTime: TimeOfDay.now());
+                  selectedTime = time;
                   TimeOfDay nowTime = TimeOfDay.now();
                   DateTime nowDate = DateTime.now();
                   bool past = false;
@@ -419,7 +433,15 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       print("BOOKED $book");
                       if (book) {
                         await BlocProvider.of<CartCubit>(context).emptyCart();
-                        // Navigator.pop(context);
+                        await controller.showScheduleNotification(
+                            'Booking Reminder',
+                            'You have a booking on $_date at $_time',
+                            dateTime: DateTime(
+                                selectedDate.year,
+                                selectedDate.month,
+                                selectedDate.day,
+                                selectedTime.hour - 1,
+                                selectedTime.minute));
                         await showDialog(
                             barrierDismissible: false,
                             context: context,

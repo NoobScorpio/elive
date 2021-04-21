@@ -28,99 +28,182 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Header(title: "Sign In"),
-            SizedBox(
-              height: 30,
+      body: Stack(
+        children: [
+          Opacity(
+            opacity: 0.1,
+            child: Image.asset(
+              "assets/images/bg.jpg",
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.cover,
             ),
-            CircleAvatar(
-              backgroundColor: Colors.black,
-              radius: 42,
-              child: CircleAvatar(
-                radius: 40,
-                backgroundImage: AssetImage('assets/images/logo.jpeg'),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              "Elive Beauty Saloon",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w600),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-              child: TextField(
-                controller: email,
-                keyboardType: TextInputType.emailAddress,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  hintText: 'Enter Email',
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
+          ),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Header(title: "Sign In"),
+                SizedBox(
+                  height: 30,
                 ),
-                onChanged: (val) {
-                  // username = val;
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-              child: TextField(
-                controller: password,
-                keyboardType: TextInputType.emailAddress,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  hintText: 'Enter Password',
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
+                CircleAvatar(
+                  backgroundColor: Colors.black,
+                  radius: 42,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage('assets/images/logo.jpeg'),
+                  ),
                 ),
-                onChanged: (val) {
-                  // username = val;
-                },
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            InkWell(
-              onTap: () async {
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (_) => loader());
-                Pattern pattern =
-                    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)'
-                    r'|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]'
-                    r'{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-                RegExp emailRegex = new RegExp(pattern);
-                if (emailRegex
-                    .hasMatch(email.text.toString().trim().toLowerCase())) {
-                  if (password.text.length >= 6) {
-                    MyUser user = await auth.signInWithEmail(
-                        email: email.text.toLowerCase(),
-                        password: password.text);
-                    if (user == null) {
-                      showToast("Please try again", Colors.red);
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Elive Beauty Saloon",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w600),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                  child: TextField(
+                    controller: email,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Email',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                    ),
+                    onChanged: (val) {
+                      // username = val;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                  child: TextField(
+                    controller: password,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Password',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                    ),
+                    onChanged: (val) {
+                      // username = val;
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                InkWell(
+                  onTap: () async {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => loader());
+                    Pattern pattern =
+                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)'
+                        r'|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]'
+                        r'{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                    RegExp emailRegex = new RegExp(pattern);
+                    if (emailRegex
+                        .hasMatch(email.text.toString().trim().toLowerCase())) {
+                      if (password.text.length >= 6) {
+                        MyUser user = await auth.signInWithEmail(
+                            email: email.text.toLowerCase(),
+                            password: password.text);
+                        if (user == null) {
+                          showToast("Please try again", Colors.red);
+                          Navigator.pop(context);
+                        } else {
+                          await preferences.setString(
+                              SPS.user.toString(), json.encode(user.toJson()));
+                          await preferences.setBool(
+                              SPS.loggedIn.toString(), true);
+                          await preferences.setBool(
+                              SPS.emailLogIn.toString(), true);
+                          Navigator.pop(context);
+                          showToast("Success", Colors.green);
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => MultiBlocProvider(providers: [
+                                        BlocProvider<UserCubit>(
+                                          create: (context) => UserCubit(),
+                                        ),
+                                        BlocProvider<CategoryCubit>(
+                                            create: (context) =>
+                                                CategoryCubit()),
+                                        BlocProvider<CartCubit>(
+                                            create: (context) => CartCubit(
+                                                cartRepository:
+                                                    CartRepositoryImpl())),
+                                      ], child: BottomNavBar())),
+                              (route) => false);
+                        }
+                      } else {
+                        //  PASS ELSE
+                        Navigator.pop(context);
+                        showToast("Password should have at least 6 characters",
+                            Colors.black);
+                      }
+                    } else {
+                      //  EMAIL ELSE
                       Navigator.pop(context);
+                      showToast("Enter a valid Email", Colors.black);
+                    }
+                  },
+                  child: Container(
+                    width: 240,
+                    height: 50,
+                    child: Card(
+                        elevation: 5,
+                        // color: Color(0xFF4267B2),
+                        color: getPrimaryColor(context),
+                        child: Center(
+                          child: Text(
+                            'Sign In',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        )),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                InkWell(
+                  onTap: () async {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => loader());
+                    MyUser user = await auth.signInWithGoogle();
+                    if (user == null) {
+                      Navigator.pop(context);
+                      showToast("Please try again", Colors.red);
                     } else {
                       await preferences.setString(
                           SPS.user.toString(), json.encode(user.toJson()));
                       await preferences.setBool(SPS.loggedIn.toString(), true);
                       await preferences.setBool(
-                          SPS.emailLogIn.toString(), true);
+                          SPS.googleLogIn.toString(), true);
+
                       Navigator.pop(context);
                       showToast("Success", Colors.green);
                       Navigator.pushAndRemoveUntil(
@@ -139,307 +222,245 @@ class _SignInScreenState extends State<SignInScreen> {
                                   ], child: BottomNavBar())),
                           (route) => false);
                     }
-                  } else {
-                    //  PASS ELSE
-                    Navigator.pop(context);
-                    showToast("Password should have at least 6 characters",
-                        Colors.black);
-                  }
-                } else {
-                  //  EMAIL ELSE
-                  Navigator.pop(context);
-                  showToast("Enter a valid Email", Colors.black);
-                }
-              },
-              child: Container(
-                width: 240,
-                height: 50,
-                child: Card(
-                    elevation: 5,
-                    // color: Color(0xFF4267B2),
-                    color: getPrimaryColor(context),
-                    child: Center(
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    )),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            InkWell(
-              onTap: () async {
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (_) => loader());
-                MyUser user = await auth.signInWithGoogle();
-                if (user == null) {
-                  Navigator.pop(context);
-                  showToast("Please try again", Colors.red);
-                } else {
-                  await preferences.setString(
-                      SPS.user.toString(), json.encode(user.toJson()));
-                  await preferences.setBool(SPS.loggedIn.toString(), true);
-                  await preferences.setBool(SPS.googleLogIn.toString(), true);
-
-                  Navigator.pop(context);
-                  showToast("Success", Colors.green);
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => MultiBlocProvider(providers: [
-                                BlocProvider<UserCubit>(
-                                  create: (context) => UserCubit(),
+                  },
+                  child: Container(
+                    width: 240,
+                    height: 50,
+                    child: Card(
+                        elevation: 5,
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 15,
+                                backgroundImage:
+                                    AssetImage('assets/images/google.png'),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                'Sign in with Google',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ),
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                InkWell(
+                  onTap: () async {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (_) => AlertDialog(
+                              title: Text("Sign in with Phone"),
+                              content: Container(
+                                height: 150,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextField(
+                                      controller: phone,
+                                      keyboardType: TextInputType.number,
+                                      cursorColor: Colors.black,
+                                      decoration: InputDecoration(
+                                        prefixIcon: InkWell(
+                                            onTap: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (_) => AlertDialog(
+                                                        content: Text(
+                                                            "Please enter complete number. For example, "
+                                                            "if you are from Dubai enter number like "
+                                                            "+971xxxxxxxx"),
+                                                      ));
+                                            },
+                                            child: Icon(Icons.info_outline)),
+                                        suffixIcon: InkWell(
+                                            onTap: () async {
+                                              showToast(
+                                                  "Sending code", Colors.blue);
+                                              await auth.verifyPhone(
+                                                  number: phone.text);
+                                              Navigator.pop(context);
+                                            },
+                                            child: Icon(Icons.send)),
+                                        hintText: 'Enter Phone No.',
+                                        border: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.grey)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.black)),
+                                      ),
+                                      onChanged: (val) {
+                                        // username = val;
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    TextField(
+                                      controller: code,
+                                      keyboardType: TextInputType.number,
+                                      cursorColor: Colors.black,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter Code',
+                                        border: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.grey)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.black)),
+                                      ),
+                                      onChanged: (val) {
+                                        // username = val;
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                BlocProvider<CategoryCubit>(
-                                    create: (context) => CategoryCubit()),
-                                BlocProvider<CartCubit>(
-                                    create: (context) => CartCubit(
-                                        cartRepository: CartRepositoryImpl())),
-                              ], child: BottomNavBar())),
-                      (route) => false);
-                }
-              },
-              child: Container(
-                width: 240,
-                height: 50,
-                child: Card(
-                    elevation: 5,
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundImage:
-                                AssetImage('assets/images/google.png'),
+                              ),
+                              actions: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                  onTap: () async {
+                                    showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (_) => loader());
+                                    MyUser user =
+                                        await auth.signInWithPhoneCredentials(
+                                      code: code.text.toString(),
+                                    );
+                                    if (user == null) {
+                                      Navigator.pop(context);
+                                      showToast("Please try again", Colors.red);
+                                    } else {
+                                      await preferences.setString(
+                                          SPS.user.toString(),
+                                          json.encode(user.toJson()));
+                                      await preferences.setBool(
+                                          SPS.loggedIn.toString(), true);
+                                      await preferences.setBool(
+                                          SPS.phoneLogIn.toString(), true);
+                                      Navigator.pop(context);
+                                      showToast("Success", Colors.green);
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  MultiBlocProvider(providers: [
+                                                    BlocProvider<UserCubit>(
+                                                      create: (context) =>
+                                                          UserCubit(),
+                                                    ),
+                                                    BlocProvider<CategoryCubit>(
+                                                        create: (context) =>
+                                                            CategoryCubit()),
+                                                    BlocProvider<CartCubit>(
+                                                        create: (context) =>
+                                                            CartCubit(
+                                                                cartRepository:
+                                                                    CartRepositoryImpl())),
+                                                  ], child: BottomNavBar())),
+                                          (route) => false);
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "Sign in",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ));
+                  },
+                  child: Container(
+                    width: 240,
+                    height: 50,
+                    child: Card(
+                        elevation: 5,
+                        // color: Color(0xFF4267B2),
+                        color: Colors.black,
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.phone,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                'Sign in with Phone',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            'Sign in with Google',
+                        )),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text('Or'),
+                ),
+                InkWell(
+                  onTap: () async {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => SignUpScreen()));
+                  },
+                  child: Container(
+                    width: 240,
+                    height: 50,
+                    child: Card(
+                        elevation: 5,
+                        // color: Color(0xFF4267B2),
+                        color: getPrimaryColor(context),
+                        child: Center(
+                          child: Text(
+                            'Sign Up',
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600),
                           ),
-                        ],
-                      ),
-                    )),
-              ),
+                        )),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(
-              height: 5,
-            ),
-            InkWell(
-              onTap: () async {
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (_) => AlertDialog(
-                          title: Text("Sign in with Phone"),
-                          content: Container(
-                            height: 150,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                TextField(
-                                  controller: phone,
-                                  keyboardType: TextInputType.number,
-                                  cursorColor: Colors.black,
-                                  decoration: InputDecoration(
-                                    prefixIcon: InkWell(
-                                        onTap: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (_) => AlertDialog(
-                                                    content: Text(
-                                                        "Please enter complete number. For example, "
-                                                        "if you are from Dubai enter number like "
-                                                        "+971xxxxxxxx"),
-                                                  ));
-                                        },
-                                        child: Icon(Icons.info_outline)),
-                                    suffixIcon: InkWell(
-                                        onTap: () async {
-                                          showToast(
-                                              "Sending code", Colors.blue);
-                                          await auth.verifyPhone(
-                                              number: phone.text);
-                                          Navigator.pop(context);
-                                        },
-                                        child: Icon(Icons.send)),
-                                    hintText: 'Enter Phone No.',
-                                    border: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: Colors.grey)),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                  ),
-                                  onChanged: (val) {
-                                    // username = val;
-                                  },
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                TextField(
-                                  controller: code,
-                                  keyboardType: TextInputType.number,
-                                  cursorColor: Colors.black,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter Code',
-                                    border: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: Colors.grey)),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                  ),
-                                  onChanged: (val) {
-                                    // username = val;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (_) => loader());
-                                MyUser user =
-                                    await auth.signInWithPhoneCredentials(
-                                  code: code.text.toString(),
-                                );
-                                if (user == null) {
-                                  Navigator.pop(context);
-                                  showToast("Please try again", Colors.red);
-                                } else {
-                                  await preferences.setString(
-                                      SPS.user.toString(),
-                                      json.encode(user.toJson()));
-                                  await preferences.setBool(
-                                      SPS.loggedIn.toString(), true);
-                                  await preferences.setBool(
-                                      SPS.phoneLogIn.toString(), true);
-                                  Navigator.pop(context);
-                                  showToast("Success", Colors.green);
-                                  Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              MultiBlocProvider(providers: [
-                                                BlocProvider<UserCubit>(
-                                                  create: (context) =>
-                                                      UserCubit(),
-                                                ),
-                                                BlocProvider<CategoryCubit>(
-                                                    create: (context) =>
-                                                        CategoryCubit()),
-                                                BlocProvider<CartCubit>(
-                                                    create: (context) => CartCubit(
-                                                        cartRepository:
-                                                            CartRepositoryImpl())),
-                                              ], child: BottomNavBar())),
-                                      (route) => false);
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Sign in",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ));
-              },
-              child: Container(
-                width: 240,
-                height: 50,
-                child: Card(
-                    elevation: 5,
-                    // color: Color(0xFF4267B2),
-                    color: Colors.black,
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.phone,
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            'Sign in with Phone',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Text('Or'),
-            ),
-            InkWell(
-              onTap: () async {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => SignUpScreen()));
-              },
-              child: Container(
-                width: 240,
-                height: 50,
-                child: Card(
-                    elevation: 5,
-                    // color: Color(0xFF4267B2),
-                    color: getPrimaryColor(context),
-                    child: Center(
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    )),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
