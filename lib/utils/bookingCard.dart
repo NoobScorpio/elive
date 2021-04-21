@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-class BookingCard extends StatefulWidget {
-  @override
-  _BookingCardState createState() => _BookingCardState();
-}
+class BookingCard extends StatelessWidget {
+  final id, time, date, price;
 
-class _BookingCardState extends State<BookingCard> {
+  const BookingCard({Key key, this.id, this.time, this.date, this.price})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -28,7 +27,7 @@ class _BookingCardState extends State<BookingCard> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Text(
-                      "Booking ID: 1",
+                      "Booking ID: $id",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -38,7 +37,7 @@ class _BookingCardState extends State<BookingCard> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
-                      "Date: 20-04-2021",
+                      "Date: $date",
                       style: TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -51,7 +50,7 @@ class _BookingCardState extends State<BookingCard> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
-                      "Time: 8:00 PM",
+                      "Time: $time",
                       style: TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -77,7 +76,7 @@ class _BookingCardState extends State<BookingCard> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
-                      "SAR 123",
+                      "SAR $price",
                       style: TextStyle(
                           color: Colors.grey,
                           fontSize: 14,

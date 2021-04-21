@@ -94,47 +94,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: InkWell(
-                              onTap: () {
-                                print("USER BEFORE EDIT ${state.user}");
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => BlocProvider(
-                                              create: (context) => UserCubit(),
-                                              child: EditProfile(
-                                                  phoneLogin: phoneLogin,
-                                                  googleLogin: googleLogin,
-                                                  emailLogin: emailLogin,
-                                                  user: state.user),
-                                            )));
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 8),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.black,
-                                  radius: 21,
-                                  child: CircleAvatar(
-                                      backgroundColor: Colors.white,
-                                      radius: 20,
-                                      child:
-                                          Icon(Icons.edit, color: Colors.red)),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Stack(
+                            children: [
+                              Center(
+                                child: Container(
+                                  height: 100,
+                                  width: MediaQuery.of(context).size.width - 50,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25),
+                                      color: Colors.black,
+                                      gradient: LinearGradient(
+                                          colors: [Colors.red, Colors.black],
+                                          tileMode: TileMode.repeated)),
+                                  child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: InkWell(
+                                      onTap: () {
+                                        print("USER BEFORE EDIT ${state.user}");
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) => BlocProvider(
+                                                      create: (context) =>
+                                                          UserCubit(),
+                                                      child: EditProfile(
+                                                          phoneLogin:
+                                                              phoneLogin,
+                                                          googleLogin:
+                                                              googleLogin,
+                                                          emailLogin:
+                                                              emailLogin,
+                                                          user: state.user),
+                                                    )));
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 8),
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.black,
+                                          radius: 21,
+                                          child: CircleAvatar(
+                                              backgroundColor: Colors.red,
+                                              radius: 20,
+                                              child: Icon(Icons.edit,
+                                                  color: Colors.black)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          CircleAvatar(
-                            radius: 51,
-                            backgroundColor: Colors.black,
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage: state.user.photoUrl == ""
-                                  ? AssetImage('assets/images/face.jpg')
-                                  : NetworkImage(state.user.photoUrl),
-                            ),
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 35.0),
+                                  child: Container(
+                                    height: 102,
+                                    width: 102,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        color: Colors.black,
+                                        gradient: LinearGradient(
+                                            colors: [
+                                              Colors.white,
+                                              Colors.black
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: CircleAvatar(
+                                        radius: 50,
+                                        backgroundImage: state.user.photoUrl ==
+                                                ""
+                                            ? AssetImage(
+                                                'assets/images/face.jpg')
+                                            : NetworkImage(state.user.photoUrl),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(
                             height: 10,
@@ -309,7 +353,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => BookingScreen()));
+                                        builder: (_) =>
+                                            BookingScreen(user: state.user)));
                               },
                               child: Row(
                                 mainAxisAlignment:

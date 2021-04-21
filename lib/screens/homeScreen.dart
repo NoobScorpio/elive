@@ -227,48 +227,53 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 10),
                     child: Text(
-                      "Select Services",
+                      "Services Available",
                       style: headerText,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: double.maxFinite,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.red,
-                          ),
-                          iconSize: 42,
-                          value: serviceSelected,
-                          focusColor: Colors.red,
-                          items: services.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  '$value',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (_) {
-                            setState(() {
-                              serviceSelected = _;
-                              print(serviceSelected);
-                            });
-                          },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Home",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 16),
+                            )
+                          ],
                         ),
-                      ),
+                        SizedBox(
+                          width: 25,
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Saloon",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 16),
+                            )
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                   Padding(

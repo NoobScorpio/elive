@@ -170,7 +170,9 @@ class _CartScreenState extends State<CartScreen> {
                                           total: state.total),
                                     )));
                         if (booked != null) {
+                          print("BOOKED NOT NULL");
                           setState(() {});
+                          await BlocProvider.of<CartCubit>(context).emptyCart();
                         }
                       },
                       child: Text(

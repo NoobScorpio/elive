@@ -47,7 +47,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             CachedNetworkImage(
               imageUrl: image,
               imageBuilder: (context, image) => Container(
-                width: widget.width - 50,
+                width: widget.width,
                 height: 150,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -55,12 +55,10 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 ),
               ),
               progressIndicatorBuilder: (context, img, progress) => Container(
-                width: widget.width - 50,
+                width: widget.width,
                 height: 150,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Container(
                   height: 50,
@@ -73,12 +71,10 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 ),
               ),
               errorWidget: (context, img, err) => Container(
-                width: widget.width - 50,
+                width: widget.width,
                 height: 150,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Center(
                   child: Icon(
@@ -104,7 +100,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             Padding(
               padding: const EdgeInsets.all(1),
               child: Container(
-                width: widget.width - 50,
+                width: widget.width,
                 height: 150,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -115,7 +111,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             Padding(
               padding: const EdgeInsets.all(1),
               child: Container(
-                width: widget.width - 50,
+                width: widget.width,
                 height: 150,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -347,13 +343,29 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 children: itemWidgets,
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await BlocProvider.of<CartCubit>(context).getItems();
-          await BlocProvider.of<CartCubit>(context).emptyCart();
-          print('CART EMPTY');
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     // await BlocProvider.of<CartCubit>(context).getItems();
+      //     // await BlocProvider.of<CartCubit>(context).emptyCart();
+      //     // print('CART EMPTY');
+      //     // CartItem cartItem = CartItem();
+      //     // cartItem.qty = 1;
+      //     // cartItem.name = "abc";
+      //     // cartItem.pid = 1;
+      //     // cartItem.id = 1;
+      //     // cartItem.price = 50.toString();
+      //     // cartItem.pName = 'name';
+      //     // cartItem.img = widget.image;
+      //     // bool added =
+      //     //     await BlocProvider.of<CartCubit>(context).addItem(cartItem);
+      //     bool fed = await ApiController.postFeedback(
+      //         email: "aliadam@gmail.com", feedback: "okayt");
+      //     if (fed)
+      //       showToast("OK", Colors.green);
+      //     else
+      //       showToast("no", Colors.red);
+      //   },
+      // ),
     );
   }
 }

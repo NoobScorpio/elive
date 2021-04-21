@@ -388,95 +388,109 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                   onPressed: () async {
-                    showDialog(context: context, builder: (_) => loader());
-                    var pref = await SharedPreferences.getInstance();
-                    print("PREFS $pref");
-                    String str = pref.getString(SPS.user.toString());
-                    print("USER STR $str");
-                    MyUser user = MyUser.fromJson(json.decode(str));
-                    print("USER $user");
-                    Booking booking = Booking(
-                        userEmail: user.email,
-                        firestoreId: user.uid,
-                        description: widget.desc,
-                        date: _date,
-                        time: _time,
-                        service: serviceSelected,
-                        total: (promoBool
-                                ? (serviceSelected == 'Home'
-                                    ? total - promoPrice + 70
-                                    : total - promoPrice)
-                                : (serviceSelected == 'Home'
-                                    ? total + 70
-                                    : total))
-                            .toInt());
-                    print("BOOKING ${booking.toJson()}");
-                    bool book =
-                        await ApiController.postBooking(booking: booking);
-                    print("BOOKED $book");
-                    if (!book) {
-                      await BlocProvider.of<CartCubit>(context).emptyCart();
-                      Navigator.pop(context);
-                      showDialog(
-                          context: context,
-                          builder: (_) {
-                            final feed = TextEditingController();
-                            return AlertDialog(
-                              title: Text("Give Feedback"),
-                              content: Container(
-                                height: 150,
-                                child: Column(
-                                  children: [
-                                    TextField(
-                                      maxLines: 5,
-                                      controller: feed,
-                                      keyboardType: TextInputType.emailAddress,
-                                      cursorColor: Colors.black,
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter FeedBack',
-                                        border: OutlineInputBorder(
-                                            borderSide:
-                                                BorderSide(color: Colors.grey)),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: Colors.black)),
-                                      ),
-                                      onChanged: (val) {
-                                        // username = val;
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                InkWell(
-                                    onTap: () async {
-                                      showDialog(
-                                          context: context,
-                                          builder: (_) => loader());
-                                      var bool =
-                                          await ApiController.postFeedback(
-                                              email: user.email,
-                                              feedback: feed.text);
-                                      if (bool) {
-                                        Navigator.pop(context);
-                                        showToast("Thanks for the feedback",
-                                            Colors.green);
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                    child: Text("Send")),
-                              ],
-                            );
-                          });
-
-                      print("EMPTY CART");
-                      Navigator.pop(context);
-                      Navigator.pop(context, true);
-                      showToast("Booked", Colors.green);
+                    if (_time == 'Not Set' || _date == 'Not Set') {
+                      showToast("Select date and time", Colors.red);
                     } else {
-                      Navigator.pop(context);
-                      showToast("Not Booked", Colors.red);
+                      showDialog(context: context, builder: (_) => loader());
+                      var pref = await SharedPreferences.getInstance();
+                      print("PREFS $pref");
+                      String str = pref.getString(SPS.user.toString());
+                      print("USER STR $str");
+                      MyUser user = MyUser.fromJson(json.decode(str));
+                      print("USER $user");
+                      Booking booking = Booking(
+                          userEmail: user.email,
+                          firestoreId: user.uid,
+                          description: widget.desc,
+                          date: _date,
+                          time: _time,
+                          service: serviceSelected,
+                          total: (promoBool
+                                  ? (serviceSelected == 'Home'
+                                      ? total - promoPrice + 70
+                                      : total - promoPrice)
+                                  : (serviceSelected == 'Home'
+                                      ? total + 70
+                                      : total))
+                              .toInt());
+                      print("BOOKING ${booking.toJson()}");
+                      bool book =
+                          await ApiController.postBooking(booking: booking);
+                      print("BOOKED $book");
+                      if (book) {
+                        await BlocProvider.of<CartCubit>(context).emptyCart();
+                        // Navigator.pop(context);
+                        await showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) {
+                              final feed = TextEditingController();
+                              return AlertDialog(
+                                title: Text("Give Feedback"),
+                                content: Container(
+                                  height: 150,
+                                  child: Column(
+                                    children: [
+                                      TextField(
+                                        maxLines: 5,
+                                        controller: feed,
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter FeedBack',
+                                          border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey)),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.black)),
+                                        ),
+                                        onChanged: (val) {
+                                          // username = val;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  InkWell(
+                                      onTap: () async {
+                                        showDialog(
+                                            context: context,
+                                            builder: (_) => loader());
+                                        var bool =
+                                            await ApiController.postFeedback(
+                                                email: user.email,
+                                                feedback: feed.text);
+                                        if (bool) {
+                                          Navigator.pop(context);
+                                          showToast("Thanks for the feedback",
+                                              Colors.green);
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          "Send",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      )),
+                                ],
+                              );
+                            });
+
+                        print("EMPTY CART");
+                        Navigator.pop(context);
+                        Navigator.pop(context, true);
+                        showToast("Booked", Colors.green);
+                      } else {
+                        Navigator.pop(context);
+                        showToast("Not Booked", Colors.red);
+                      }
                     }
                   },
                   child: Text(
