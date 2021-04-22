@@ -13,6 +13,8 @@ MaterialColor getPrimaryColor(context) {
   return Colors.red;
 }
 
+String username = 'elivebeautyspotdubai@gmail.com';
+String password = 'elivebeautyspot@123';
 const baseURL = 'https://elivebeautyspot.in/admin/api/package';
 const imageURL = 'https://elivebeautyspot.in/admin/upload';
 enum SPS {
@@ -114,7 +116,7 @@ Widget getCard({title, image, height, width, special}) {
             padding: const EdgeInsets.all(12.0),
             child: Text(title,
                 style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white)),
           ),

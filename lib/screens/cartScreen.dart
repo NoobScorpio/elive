@@ -10,8 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartScreen extends StatefulWidget {
   final cartItems;
-
-  const CartScreen({Key key, this.cartItems}) : super(key: key);
+  final bool item;
+  const CartScreen({Key key, this.cartItems, this.item}) : super(key: key);
   @override
   _CartScreenState createState() => _CartScreenState();
 }
@@ -44,14 +44,39 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return isLoading
         ? Scaffold(
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            body: Stack(
               children: [
-                Header(title: 'Cart'),
-                SizedBox(
-                  height: 150,
+                Opacity(
+                  opacity: 0.1,
+                  child: Image.asset(
+                    "assets/images/bg.png",
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                loader()
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Header(title: 'Cart'),
+                    if (widget.item != null)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_outlined,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            }),
+                      ),
+                    SizedBox(
+                      height: 150,
+                    ),
+                    loader()
+                  ],
+                ),
               ],
             ),
           )
@@ -86,6 +111,18 @@ class _CartScreenState extends State<CartScreen> {
                 if (state.cartItems == null || state.cartItems.length == 0) {
                   cartItemWidgets = [
                     Header(title: "Cart"),
+                    if (widget.item != null)
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_outlined,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            }),
+                      ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text('No items in the cart'),
@@ -109,6 +146,18 @@ class _CartScreenState extends State<CartScreen> {
                   // print('@ITEMS $names');
                   cartItemWidgets = [
                     Header(title: "Cart"),
+                    if (widget.item != null)
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_outlined,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            }),
+                      ),
                     SizedBox(
                       height: 15,
                     ),
@@ -184,10 +233,23 @@ class _CartScreenState extends State<CartScreen> {
                   ));
                 }
                 return Scaffold(
-                  body: SingleChildScrollView(
-                    child: Column(
-                      children: cartItemWidgets,
-                    ),
+                  body: Stack(
+                    children: [
+                      Opacity(
+                        opacity: 0.05,
+                        child: Image.asset(
+                          "assets/images/bg.png",
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        child: Column(
+                          children: cartItemWidgets,
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }

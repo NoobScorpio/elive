@@ -33,7 +33,7 @@ class _SignInScreenState extends State<SignInScreen> {
           Opacity(
             opacity: 0.1,
             child: Image.asset(
-              "assets/images/bg.jpg",
+              "assets/images/bg.png",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -263,10 +263,17 @@ class _SignInScreenState extends State<SignInScreen> {
                         builder: (_) => AlertDialog(
                               title: Text("Sign in with Phone"),
                               content: Container(
-                                height: 150,
+                                height: 170,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 10.0),
+                                      child: Text(
+                                          "Note: Sign up with this number before "
+                                          "signing in"),
+                                    ),
                                     TextField(
                                       controller: phone,
                                       keyboardType: TextInputType.number,
@@ -280,7 +287,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                         content: Text(
                                                             "Please enter complete number. For example, "
                                                             "if you are from Dubai enter number like "
-                                                            "+971xxxxxxxx"),
+                                                            "971xxxxxxxx"),
                                                       ));
                                             },
                                             child: Icon(Icons.info_outline)),

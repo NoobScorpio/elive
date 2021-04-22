@@ -41,11 +41,11 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<bool> removeItem(String name) async {
+  Future<bool> removeItem(String name, {qty}) async {
     try {
       dynamic sub = 0.0, total = 0.0;
       int qty = 0;
-      List<CartItem> removed = await cartRepository.removeItem(name);
+      List<CartItem> removed = await cartRepository.removeItem(name, qty: qty);
       sp = await SharedPreferences.getInstance();
 
       if (removed.length > 0) {

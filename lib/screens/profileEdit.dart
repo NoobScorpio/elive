@@ -32,20 +32,23 @@ class _EditProfileState extends State<EditProfile> {
       {this.googleLogin, this.emailLogin, this.phoneLogin, this.user});
   final name = TextEditingController();
   final pass = TextEditingController();
-  final dob = TextEditingController();
   MyUser user;
   setUser() async {
     await init();
     name.text = user.name;
     pass.text = user.password;
-    dob.text = user.dob;
+    dob = user.dob == '' || user.dob == null ? stockDate : user.dob;
     await loginUserState(context);
   }
 
+  DateTime date = DateTime.now();
+  String stockDate = "(YYYY-MM-DD)";
+  String dob;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     setUser();
     controller.setOnNotificationReceive(onNotificationReceive);
     controller.setOnNotificationClick(onNotificationClick);
@@ -79,255 +82,321 @@ class _EditProfileState extends State<EditProfile> {
               color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600),
         ),
       ),
-      body: SingleChildScrollView(
-        child: BlocBuilder<UserCubit, UserState>(
-          builder: (context, state) {
-            if (state is UserInitialState) {
-              return loader();
-            } else if (state is UserLoadingState) {
-              return loader();
-            } else if (state is UserLoadedState) {
-              if (state.user == null) {
-                return loader();
-              } else {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Container(
-                      height: 100,
-                      width: 100,
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 51,
-                            backgroundColor: Colors.black,
-                            child: CircleAvatar(
-                              radius: 49,
-                              backgroundImage: state.user.photoUrl == ""
-                                  ? AssetImage('assets/images/face.jpg')
-                                  : NetworkImage(state.user.photoUrl),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: InkWell(
-                              onTap: () async {
-                                showDialog(
-                                    context: context, builder: (_) => loader());
-                                try {
-                                  List<Media> res = await ImagesPicker.pick(
-                                    count: 1,
-                                    pickType: PickType.image,
-                                    cropOpt: CropOption(
-                                      aspectRatio: CropAspectRatio.custom,
-                                      cropType: CropType
-                                          .rect, // currently for android
-                                    ),
-                                  );
-                                  File image = File(res[0].path);
-                                  FirebaseStorage _storage;
-                                  UploadTask _uploadTask;
-                                  _storage = FirebaseStorage.instanceFor(
-                                      bucket: 'gs://elive-bfc34.appspot.com');
-                                  String fileName = DateTime.now()
-                                      .millisecondsSinceEpoch
-                                      .toString();
-                                  setState(() {
-                                    _uploadTask = _storage
-                                        .ref()
-                                        .child('images')
-                                        .child(fileName)
-                                        .putFile(image);
-                                  });
-                                  TaskSnapshot ts = _uploadTask.snapshot;
-                                  _uploadTask.then((TaskSnapshot taskSnapshot) {
-                                    taskSnapshot.ref
-                                        .getDownloadURL()
-                                        .then((value) async {
-                                      user.photoUrl = value;
+      body: Stack(
+        children: [
+          Opacity(
+            opacity: 0.1,
+            child: Image.asset(
+              "assets/images/bg.png",
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SingleChildScrollView(
+            child: BlocBuilder<UserCubit, UserState>(
+              builder: (context, state) {
+                if (state is UserInitialState) {
+                  return loader();
+                } else if (state is UserLoadingState) {
+                  return loader();
+                } else if (state is UserLoadedState) {
+                  if (state.user == null) {
+                    return loader();
+                  } else {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Container(
+                          height: 100,
+                          width: 100,
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 51,
+                                backgroundColor: Colors.black,
+                                child: CircleAvatar(
+                                  radius: 49,
+                                  backgroundImage: state.user.photoUrl == ""
+                                      ? AssetImage('assets/images/face.jpg')
+                                      : NetworkImage(state.user.photoUrl),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: InkWell(
+                                  onTap: () async {
+                                    showDialog(
+                                        context: context,
+                                        builder: (_) => loader());
+                                    try {
+                                      List<Media> res = await ImagesPicker.pick(
+                                        count: 1,
+                                        pickType: PickType.image,
+                                        cropOpt: CropOption(
+                                          aspectRatio: CropAspectRatio.custom,
+                                          cropType: CropType
+                                              .rect, // currently for android
+                                        ),
+                                      );
+                                      File image = File(res[0].path);
+                                      FirebaseStorage _storage;
+                                      UploadTask _uploadTask;
+                                      _storage = FirebaseStorage.instanceFor(
+                                          bucket:
+                                              'gs://elive-bfc34.appspot.com');
+                                      String fileName = DateTime.now()
+                                          .millisecondsSinceEpoch
+                                          .toString();
+                                      setState(() {
+                                        _uploadTask = _storage
+                                            .ref()
+                                            .child('images')
+                                            .child(fileName)
+                                            .putFile(image);
+                                      });
+                                      TaskSnapshot ts = _uploadTask.snapshot;
+                                      _uploadTask
+                                          .then((TaskSnapshot taskSnapshot) {
+                                        taskSnapshot.ref
+                                            .getDownloadURL()
+                                            .then((value) async {
+                                          user.photoUrl = value;
 
+                                          await init();
+                                          preferences.setString(
+                                              SPS.user.toString(),
+                                              json.encode(user.toJson()));
+                                          await Database()
+                                              .updateUser(user: user);
+                                          await loginUserState(context);
+                                          Navigator.pop(context);
+                                          showToast("Saved", Colors.green);
+                                        });
+                                      });
+                                    } catch (e) {
+                                      print("IMAGE UPLOAD EXCEPTION $e");
+                                      showToast("${e.message}", Colors.green);
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: getPrimaryColor(context),
+                                    child: CircleAvatar(
+                                      radius: 17,
+                                      child: Icon(Icons.image),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Divider(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: name,
+                            keyboardType: TextInputType.name,
+                            cursorColor: Colors.black,
+                            decoration: InputDecoration(
+                              suffixIcon: InkWell(
+                                  onTap: () async {
+                                    showDialog(
+                                        context: context,
+                                        builder: (_) => loader());
+                                    if (name.text.length >= 3) {
+                                      user.name = name.text;
                                       await init();
                                       preferences.setString(SPS.user.toString(),
                                           json.encode(user.toJson()));
                                       await Database().updateUser(user: user);
                                       await loginUserState(context);
+
                                       Navigator.pop(context);
                                       showToast("Saved", Colors.green);
-                                    });
-                                  });
-                                } catch (e) {
-                                  print("IMAGE UPLOAD EXCEPTION $e");
-                                  showToast("${e.message}", Colors.green);
-                                  Navigator.pop(context);
-                                }
-                              },
-                              child: CircleAvatar(
-                                radius: 18,
-                                backgroundColor: getPrimaryColor(context),
-                                child: CircleAvatar(
-                                  radius: 17,
-                                  child: Icon(Icons.image),
-                                ),
+                                    } else {
+                                      showToast(
+                                          "Name should have at least 3 characters",
+                                          Colors.red);
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.save,
+                                    color: Colors.black,
+                                  )),
+                              hintText: 'Enter name',
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black)),
+                            ),
+                            onChanged: (val) {
+                              // username = val;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 15),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Date of birth: $dob",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                          onTap: () async {
+                                            var selected = await showDatePicker(
+                                                context: context,
+                                                firstDate: DateTime.now(),
+                                                initialDate: DateTime.now(),
+                                                lastDate: DateTime(2030, 1, 1));
+
+                                            if (selected != null) {
+                                              date = selected;
+                                              setState(() {
+                                                dob = date
+                                                    .toString()
+                                                    .split(' ')[0];
+                                              });
+                                            }
+                                          },
+                                          child: Icon(
+                                            Icons.calendar_today_sharp,
+                                            color: Colors.red,
+                                            size: 20,
+                                          )),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      InkWell(
+                                          onTap: () async {
+                                            showDialog(
+                                                context: context,
+                                                builder: (_) => loader());
+                                            if (dob != stockDate ||
+                                                dob != null) {
+                                              user.dob = dob;
+                                              await init();
+                                              preferences.setString(
+                                                  SPS.user.toString(),
+                                                  json.encode(user.toJson()));
+                                              await Database()
+                                                  .updateUser(user: user);
+                                              await loginUserState(context);
+
+                                              Navigator.pop(context);
+                                              List<String> dobList =
+                                                  dob.split("-");
+
+                                              DateTime schedule = DateTime(
+                                                int.parse(dobList[0]),
+                                                int.parse(dobList[1]),
+                                                int.parse(dobList[2]),
+                                              );
+                                              print("DATE $schedule");
+                                              await controller
+                                                  .showScheduleNotification(
+                                                      'Happy Birthday',
+                                                      'Elive Wishes you a very happy birthday',
+                                                      dateTime: schedule);
+                                              showToast("Saved", Colors.green);
+                                            } else {
+                                              showToast(
+                                                  "Name should have at least 3 characters",
+                                                  Colors.red);
+                                            }
+                                          },
+                                          child: Icon(
+                                            Icons.save,
+                                            color: Colors.black,
+                                          )),
+                                    ],
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Divider(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: name,
-                        keyboardType: TextInputType.name,
-                        cursorColor: Colors.black,
-                        decoration: InputDecoration(
-                          suffixIcon: InkWell(
-                              onTap: () async {
-                                showDialog(
-                                    context: context, builder: (_) => loader());
-                                if (name.text.length >= 3) {
-                                  user.name = name.text;
-                                  await init();
-                                  preferences.setString(SPS.user.toString(),
-                                      json.encode(user.toJson()));
-                                  await Database().updateUser(user: user);
-                                  await loginUserState(context);
-
-                                  Navigator.pop(context);
-                                  showToast("Saved", Colors.green);
-                                } else {
-                                  showToast(
-                                      "Name should have at least 3 characters",
-                                      Colors.red);
-                                }
-                              },
-                              child: Icon(
-                                Icons.save,
-                                color: Colors.black,
-                              )),
-                          hintText: 'Enter name',
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black)),
                         ),
-                        onChanged: (val) {
-                          // username = val;
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: dob,
-                        keyboardType: TextInputType.name,
-                        cursorColor: Colors.black,
-                        decoration: InputDecoration(
-                          suffixIcon: InkWell(
-                              onTap: () async {
-                                showDialog(
-                                    context: context, builder: (_) => loader());
-                                if (dob.text != "Not Set") {
-                                  user.dob = dob.text;
-                                  await init();
-                                  preferences.setString(SPS.user.toString(),
-                                      json.encode(user.toJson()));
-                                  await Database().updateUser(user: user);
-                                  await loginUserState(context);
 
-                                  Navigator.pop(context);
-                                  List<String> dobList = dob.text.split("-");
-                                  await controller.showScheduleNotification(
-                                      'Happy Birthday',
-                                      'Elive Wishes you a very happy birthday',
-                                      dateTime: DateTime(
-                                        int.parse(dobList[0]),
-                                        int.parse(dobList[1]),
-                                        int.parse(dobList[2]),
-                                      ));
-                                  showToast("Saved", Colors.green);
-                                } else {
-                                  showToast(
-                                      "Name should have at least 3 characters",
-                                      Colors.red);
-                                }
-                              },
-                              child: Icon(
-                                Icons.save,
-                                color: Colors.black,
-                              )),
-                          hintText: 'DOB (YYYY-MM-DDs)',
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black)),
-                        ),
-                        onChanged: (val) {
-                          // username = val;
-                        },
-                      ),
-                    ),
-                    // if (emailLogin)
-                    //   Padding(
-                    //     padding: const EdgeInsets.all(8.0),
-                    //     child: TextField(
-                    //       controller: pass,
-                    //       keyboardType: TextInputType.number,
-                    //       cursorColor: Colors.black,
-                    //       decoration: InputDecoration(
-                    //         suffixIcon: InkWell(
-                    //             onTap: () async {
-                    //               showDialog(
-                    //                   context: context, builder: (_) => loader());
-                    //               if (pass.text.length >= 6) {
-                    //                 user.password = pass.text;
-                    //                 await init();
-                    //                 preferences.setString(
-                    //                     sharedPrefs.user.toString(),
-                    //                     json.encode(user.toJson()));
-                    //                 await Database().updateUser(user: user);
-                    //                 await loginUserState(context);
-                    //
-                    //                 Navigator.pop(context);
-                    //                 showToast("Saved", Colors.green);
-                    //               } else {
-                    //                 showToast(
-                    //                     "Name should have at least 3 characters",
-                    //                     Colors.red);
-                    //               }
-                    //             },
-                    //             child: Icon(
-                    //               Icons.save,
-                    //               color: Colors.black,
-                    //             )),
-                    //         hintText: 'Enter Code',
-                    //         border: OutlineInputBorder(
-                    //             borderSide: BorderSide(color: Colors.grey)),
-                    //         focusedBorder: OutlineInputBorder(
-                    //             borderSide: BorderSide(color: Colors.black)),
-                    //       ),
-                    //       onChanged: (val) {
-                    //         // username = val;
-                    //       },
-                    //     ),
-                    //   ),
-                  ],
-                );
-              }
-            } else if (state is UserErrorState) {
-              return loader();
-            } else {
-              return loader();
-            }
-          },
-        ),
+                        // if (emailLogin)
+                        //   Padding(
+                        //     padding: const EdgeInsets.all(8.0),
+                        //     child: TextField(
+                        //       controller: pass,
+                        //       keyboardType: TextInputType.number,
+                        //       cursorColor: Colors.black,
+                        //       decoration: InputDecoration(
+                        //         suffixIcon: InkWell(
+                        //             onTap: () async {
+                        //               showDialog(
+                        //                   context: context, builder: (_) => loader());
+                        //               if (pass.text.length >= 6) {
+                        //                 user.password = pass.text;
+                        //                 await init();
+                        //                 preferences.setString(
+                        //                     sharedPrefs.user.toString(),
+                        //                     json.encode(user.toJson()));
+                        //                 await Database().updateUser(user: user);
+                        //                 await loginUserState(context);
+                        //
+                        //                 Navigator.pop(context);
+                        //                 showToast("Saved", Colors.green);
+                        //               } else {
+                        //                 showToast(
+                        //                     "Name should have at least 3 characters",
+                        //                     Colors.red);
+                        //               }
+                        //             },
+                        //             child: Icon(
+                        //               Icons.save,
+                        //               color: Colors.black,
+                        //             )),
+                        //         hintText: 'Enter Code',
+                        //         border: OutlineInputBorder(
+                        //             borderSide: BorderSide(color: Colors.grey)),
+                        //         focusedBorder: OutlineInputBorder(
+                        //             borderSide: BorderSide(color: Colors.black)),
+                        //       ),
+                        //       onChanged: (val) {
+                        //         // username = val;
+                        //       },
+                        //     ),
+                        //   ),
+                      ],
+                    );
+                  }
+                } else if (state is UserErrorState) {
+                  return loader();
+                } else {
+                  return loader();
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

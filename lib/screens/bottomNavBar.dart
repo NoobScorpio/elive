@@ -1,3 +1,4 @@
+import 'package:elive/screens/bookingScreen.dart';
 import 'package:elive/screens/cartScreen.dart';
 import 'package:elive/screens/homeScreen.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
@@ -31,6 +32,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
       HomeScreen(),
+      BookingScreen(),
       CartScreen(),
     ];
     return Scaffold(
@@ -57,8 +59,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
             icon: Icon(Icons.home),
             label: "Home",
           ),
-
-          /// Likes
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today_sharp),
+            label: "Bookings",
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: "Cart",

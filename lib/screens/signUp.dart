@@ -23,11 +23,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final nameCont = TextEditingController();
   final emailCont = TextEditingController();
   final passwordCont = TextEditingController();
-  final dob = TextEditingController();
+  DateTime date = DateTime.now();
+  String stockDate = "(YYYY-MM-DD)";
+  String dob;
+  bool showPass = true;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    dob = stockDate;
     controller.setOnNotificationReceive(onNotificationReceive);
     controller.setOnNotificationClick(onNotificationClick);
   }
@@ -48,7 +52,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Opacity(
             opacity: 0.1,
             child: Image.asset(
-              "assets/images/bg.jpg",
+              "assets/images/bg.png",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -134,7 +138,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: passwordCont,
                     keyboardType: TextInputType.emailAddress,
                     cursorColor: Colors.black,
+                    obscureText: showPass,
                     decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            showPass = !showPass;
+                          });
+                        },
+                        icon: Icon(Icons.remove_red_eye),
+                      ),
                       hintText: 'Enter Password',
                       border: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey)),
@@ -149,20 +162,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                  child: TextField(
-                    controller: dob,
-                    keyboardType: TextInputType.emailAddress,
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      hintText: 'DOB (YYYY-MM-DD)',
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Date of birth: $dob",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          InkWell(
+                              onTap: () async {
+                                var selected = await showDatePicker(
+                                    context: context,
+                                    firstDate: DateTime.now(),
+                                    initialDate: DateTime.now(),
+                                    lastDate: DateTime(2030, 1, 1));
+
+                                if (selected != null) {
+                                  date = selected;
+                                  setState(() {
+                                    dob = date.toString().split(' ')[0];
+                                  });
+                                }
+                              },
+                              child: Icon(
+                                Icons.calendar_today_sharp,
+                                color: Colors.red,
+                              ))
+                        ],
+                      ),
                     ),
-                    onChanged: (val) {
-                      // username = val;
-                    },
                   ),
                 ),
                 SizedBox(
@@ -183,11 +219,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         emailCont.text.toString().trim().toLowerCase())) {
                       if (passwordCont.text.length >= 6) {
                         if (nameCont.text.length >= 3) {
-                          if (dob.text == '' || dob.text == null) {
+                          if (dob == '' || dob == stockDate) {
                             showToast("Enter DOB", Colors.black);
                           } else {
                             MyUser user = await auth.signUpWithEmail(
-                                dob: dob.text,
+                                dob: dob,
                                 email: emailCont.text.toString(),
                                 name: nameCont.text.toString(),
                                 password: passwordCont.text.toString());
@@ -205,7 +241,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Navigator.pop(context);
                               showToast(
                                   "User Created Successfully", Colors.green);
-                              List<String> dobList = dob.text.split("-");
+                              List<String> dobList = dob.split("-");
                               await controller.showScheduleNotification(
                                   'Happy Birthday',
                                   'Elive Wishes you a very happy birthday',

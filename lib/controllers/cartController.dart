@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 abstract class CartRepository {
   Future<List<CartItem>> addItem(CartItem cartItem);
   Future<List<CartItem>> getItems();
-  Future<List<CartItem>> removeItem(name);
+  Future<List<CartItem>> removeItem(name, {qty});
   Future<void> emptyCart();
 }
 
@@ -97,19 +97,34 @@ class CartRepositoryImpl extends CartRepository {
   }
 
   @override
-  Future<List<CartItem>> removeItem(name) async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    var getCart = sharedPreferences.getString('cart');
-    MyCart cart = MyCart();
-    cart = MyCart.fromJson(json.decode(getCart));
-    for (int i = 0; i < cart.cartItem.length; i++) {
-      if (cart.cartItem[i].pName == name) {
-        cart.cartItem.removeAt(i);
-        // break;
+  Future<List<CartItem>> removeItem(name, {qty}) async {
+    if (qty == null) {
+      sharedPreferences = await SharedPreferences.getInstance();
+      var getCart = sharedPreferences.getString('cart');
+      MyCart cart = MyCart();
+      cart = MyCart.fromJson(json.decode(getCart));
+      for (int i = 0; i < cart.cartItem.length; i++) {
+        if (cart.cartItem[i].pName == name) {
+          cart.cartItem.removeAt(i);
+          // break;
+        }
       }
+      await sharedPreferences.setString('cart', json.encode(cart.toJson()));
+      return cart.cartItem;
+    } else {
+      sharedPreferences = await SharedPreferences.getInstance();
+      var getCart = sharedPreferences.getString('cart');
+      MyCart cart = MyCart();
+      cart = MyCart.fromJson(json.decode(getCart));
+      for (int i = 0; i < cart.cartItem.length; i++) {
+        if (cart.cartItem[i].pName == name) {
+          cart.cartItem.removeAt(i);
+          break;
+        }
+      }
+      await sharedPreferences.setString('cart', json.encode(cart.toJson()));
+      return cart.cartItem;
     }
-    await sharedPreferences.setString('cart', json.encode(cart.toJson()));
-    return cart.cartItem;
   }
 
   @override
