@@ -20,6 +20,7 @@ class _CartScreenState extends State<CartScreen> {
   List<CartItem> cartItems;
   // List<Widget> cartItemWidgets = [];
   bool isLoading = true;
+
   int qty = 0, price = 0;
   void initState() {
     super.initState();
@@ -49,7 +50,7 @@ class _CartScreenState extends State<CartScreen> {
                 Opacity(
                   opacity: 0.1,
                   child: Image.asset(
-                    "assets/images/bg.png",
+                    "assets/images/bg.jpeg",
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.cover,
@@ -197,30 +198,131 @@ class _CartScreenState extends State<CartScreen> {
                   ));
                   cartItemWidgets.add(ElevatedButton(
                       onPressed: () async {
-                        String description = '';
+                        bool delete = false;
+                        await showDialog(
+                            context: context,
+                            builder: (context) {
+                              bool isCheck = false;
+                              return AlertDialog(
+                                title: Text("Agreement"),
+                                content: StatefulBuilder(
+                                  builder: (BuildContext context,
+                                          StateSetter setStates) =>
+                                      Container(
+                                    height: 130,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Please be informed, if order cancelled before taking the service, "
+                                          "20% of cancellation charges will be deducted from total cart value at the "
+                                          "time for the refund",
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Checkbox(
+                                                value: isCheck,
+                                                onChanged: (val) =>
+                                                    setStates(() {
+                                                      isCheck = val;
+                                                    })),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              "Do you agree?",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                actions: [
+                                  InkWell(
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        'No',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600),
+                                      )),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  InkWell(
+                                      onTap: () async {
+                                        if (isCheck) {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => loader());
+                                          String description = '';
 
-                        for (var item in names.keys) {
-                          description += "${names[item]}x $item <br>";
-                          cartItemWidgets.add(CartItemCard(
-                            name: item,
-                            price: prices[item],
-                            qty: names[item],
-                          ));
-                        }
-                        print(description);
-                        bool booked = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => BlocProvider(
-                                      create: (context) => CartCubit(),
-                                      child: CheckOutScreen(
-                                          desc: description,
-                                          names: names,
-                                          total: state.total),
-                                    )));
-                        if (booked != null) {
-                          print("BOOKED NOT NULL");
-                          setState(() {});
+                                          for (var item in names.keys) {
+                                            description +=
+                                                "${names[item]}x $item <br>";
+                                            cartItemWidgets.add(CartItemCard(
+                                              name: item,
+                                              price: prices[item],
+                                              qty: names[item],
+                                            ));
+                                          }
+                                          print(description);
+                                          bool booked = await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) => BlocProvider(
+                                                        create: (context) =>
+                                                            CartCubit(),
+                                                        child: CheckOutScreen(
+                                                            desc: description,
+                                                            names: names,
+                                                            total: state.total),
+                                                      )));
+                                          if (booked != null &&
+                                              booked == true) {
+                                            print("BOOKED NOT NULL");
+                                            delete = true;
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          } else {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          }
+                                          // Navigator.pop(context);
+                                        } else {
+                                          showToast(
+                                              "Kindly agree to the disclaimer",
+                                              Colors.red);
+                                        }
+                                      },
+                                      child: Text(
+                                        'Yes',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600),
+                                      )),
+                                ],
+                              );
+                            });
+                        if (delete) {
+                          print("@DELETED");
                           await BlocProvider.of<CartCubit>(context).emptyCart();
                         }
                       },
@@ -238,7 +340,7 @@ class _CartScreenState extends State<CartScreen> {
                       Opacity(
                         opacity: 0.05,
                         child: Image.asset(
-                          "assets/images/bg.png",
+                          "assets/images/bg.jpeg",
                           height: MediaQuery.of(context).size.height,
                           width: MediaQuery.of(context).size.width,
                           fit: BoxFit.cover,

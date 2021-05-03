@@ -42,7 +42,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
     ));
     itemsList.add(
       Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(10.0),
         child: Card(
           color: Colors.black,
           shape: RoundedRectangleBorder(
@@ -148,147 +148,19 @@ class _ItemsScreenState extends State<ItemsScreen> {
     } else {
       for (int i = 0; i < items.records.length; i++) {
         var item = items.records[i];
-        itemsList.add(Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-          child: Card(
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: 15,
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundImage: NetworkImage(image),
-                          ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            item.itemName,
-                            style: TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            'Some item description' + item.itemPrice,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          Text(
-                            'AED: ' + item.itemPrice,
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          CartItem cartItem = CartItem();
-                          cartItem.qty = 1;
-                          cartItem.name = item.itemName;
-                          cartItem.pid = int.parse(item.packageId);
-                          cartItem.id = int.parse(item.itemId);
-                          cartItem.price = item.itemPrice;
-                          cartItem.pName = item.itemName;
-                          cartItem.img = widget.image;
-                          bool added = await BlocProvider.of<CartCubit>(context)
-                              .removeItem(item.itemName, qty: 1);
-                          if (added) {
-                            {
-                              showToast("Service Removed", Colors.red);
-                            }
-                          } else
-                            showToast('Could not remove from cart', Colors.red);
-                        },
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(50)),
-                          ),
-                          child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 12,
-                              child: Center(
-                                  child: Text(
-                                '-',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w600),
-                              ))),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Container(
-                          height: 40,
-                          width: 0.75,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          CartItem cartItem = CartItem();
-                          cartItem.qty = 1;
-                          cartItem.name = item.itemName;
-                          cartItem.pid = int.parse(item.packageId);
-                          cartItem.id = int.parse(item.itemId);
-                          cartItem.price = item.itemPrice;
-                          cartItem.pName = item.itemName;
-                          cartItem.img = widget.image;
-                          bool added = await BlocProvider.of<CartCubit>(context)
-                              .addItem(cartItem);
-                          if (added) {
-                            {
-                              showToast("Service Added", Colors.green);
-                            }
-                          } else
-                            showToast('Could not add to cart', Colors.red);
-                        },
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(50)),
-                          ),
-                          child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 12,
-                              child: Center(child: Text('+'))),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-        ));
+        itemsList.add(itemsCard(context,
+            image: image,
+            itemName: item.itemName,
+            itemPrice: item.itemPrice,
+            packageId: item.packageId,
+            itemId: item.itemId,
+            widgetImage: widget.image,
+            time: item.timeRequire));
       }
     }
+    itemsList.add(SizedBox(
+      height: 15,
+    ));
     itemWidgets = itemsList;
     setState(() {
       loading = false;
@@ -474,7 +346,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 Opacity(
                   opacity: 0.05,
                   child: Image.asset(
-                    "assets/images/bg.png",
+                    "assets/images/bg.jpeg",
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.cover,

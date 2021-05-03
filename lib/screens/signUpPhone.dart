@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:elive/controllers/authController.dart';
-import 'package:elive/controllers/notificationController.dart';
+import 'package:elive/controllers/localNotificationController.dart';
 import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
+import 'package:elive/stateMangement/slider_bloc/sliderCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:elive/utils/header.dart';
@@ -50,7 +51,7 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
           Opacity(
             opacity: 0.07,
             child: Image.asset(
-              "assets/images/bg.png",
+              "assets/images/bg.jpeg",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -163,8 +164,8 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
                               onTap: () async {
                                 var selected = await showDatePicker(
                                     context: context,
-                                    firstDate: DateTime.now(),
-                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1968, 01, 01),
+                                    initialDate: DateTime(2000, 01, 01),
                                     lastDate: DateTime(2030, 1, 1));
 
                                 if (selected != null) {
@@ -265,15 +266,8 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
                               SPS.phoneLogIn.toString(), true);
                           Navigator.pop(context);
                           showToast("User Created Successfully", Colors.green);
-                          List<String> dobList = dob.split("-");
-                          await controller.showScheduleNotification(
-                              'Happy Birthday',
-                              'Elive Wishes you a very happy birthday',
-                              dateTime: DateTime(
-                                int.parse(dobList[0]),
-                                int.parse(dobList[1]),
-                                int.parse(dobList[2]),
-                              ));
+                          await setScheduleNotificationForBirthDay(
+                              dob, controller);
                           Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
@@ -281,6 +275,8 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
                                         BlocProvider<UserCubit>(
                                           create: (context) => UserCubit(),
                                         ),
+                                        BlocProvider<SliderCubit>(
+                                            create: (context) => SliderCubit()),
                                         BlocProvider<CategoryCubit>(
                                             create: (context) =>
                                                 CategoryCubit()),

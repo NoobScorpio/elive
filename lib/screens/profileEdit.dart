@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:elive/controllers/databaseController.dart';
-import 'package:elive/controllers/notificationController.dart';
+import 'package:elive/controllers/localNotificationController.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userState.dart';
@@ -32,6 +32,9 @@ class _EditProfileState extends State<EditProfile> {
       {this.googleLogin, this.emailLogin, this.phoneLogin, this.user});
   final name = TextEditingController();
   final pass = TextEditingController();
+  final email = TextEditingController();
+  final phone = TextEditingController();
+
   MyUser user;
   setUser() async {
     await init();
@@ -85,9 +88,9 @@ class _EditProfileState extends State<EditProfile> {
       body: Stack(
         children: [
           Opacity(
-            opacity: 0.1,
+            opacity: 0.05,
             child: Image.asset(
-              "assets/images/bg.png",
+              "assets/images/bg.jpeg",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -121,7 +124,7 @@ class _EditProfileState extends State<EditProfile> {
                                 child: CircleAvatar(
                                   radius: 49,
                                   backgroundImage: state.user.photoUrl == ""
-                                      ? AssetImage('assets/images/face.jpg')
+                                      ? AssetImage('assets/images/avatar.png')
                                       : NetworkImage(state.user.photoUrl),
                                 ),
                               ),
@@ -244,8 +247,112 @@ class _EditProfileState extends State<EditProfile> {
                           ),
                         ),
                         Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: email,
+                            keyboardType: TextInputType.emailAddress,
+                            cursorColor: Colors.black,
+                            decoration: InputDecoration(
+                              suffixIcon: InkWell(
+                                  onTap: () async {
+                                    showDialog(
+                                        context: context,
+                                        builder: (_) => loader());
+                                    Pattern pattern =
+                                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)'
+                                        r'|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]'
+                                        r'{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                                    RegExp emailRegex = new RegExp(pattern);
+                                    if (emailRegex.hasMatch(email.text
+                                        .toString()
+                                        .trim()
+                                        .toLowerCase())) {
+                                      user.email = email.text;
+                                      await init();
+                                      preferences.setString(SPS.user.toString(),
+                                          json.encode(user.toJson()));
+                                      await Database().updateUser(user: user);
+                                      await loginUserState(context);
+
+                                      Navigator.pop(context);
+                                      showToast("Saved", Colors.green);
+                                    } else {
+                                      showToast(
+                                          "Enter a valid email", Colors.red);
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.save,
+                                    color: Colors.black,
+                                  )),
+                              hintText: 'Enter email (For payment purpose)',
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black)),
+                            ),
+                            onChanged: (val) {
+                              // username = val;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: phone,
+                            keyboardType: TextInputType.phone,
+                            cursorColor: Colors.black,
+                            decoration: InputDecoration(
+                              suffixIcon: InkWell(
+                                  onTap: () async {
+                                    showDialog(
+                                        context: context,
+                                        builder: (_) => loader());
+                                    if (phone.text.length >= 10) {
+                                      user.phone = phone.text;
+                                      await init();
+                                      preferences.setString(SPS.user.toString(),
+                                          json.encode(user.toJson()));
+                                      await Database().updateUser(user: user);
+                                      await loginUserState(context);
+
+                                      Navigator.pop(context);
+                                      showToast("Saved", Colors.green);
+                                    } else {
+                                      showToast(
+                                          "Enter valid email", Colors.red);
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.save,
+                                    color: Colors.black,
+                                  )),
+                              prefixIcon: InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                              content: Text(
+                                                  "Please enter complete number. For example, "
+                                                  "if you are from Dubai enter number like "
+                                                  "971xxxxxxxx"),
+                                            ));
+                                  },
+                                  child: Icon(Icons.info_outline)),
+                              hintText: 'Enter phone',
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black)),
+                            ),
+                            onChanged: (val) {
+                              // username = val;
+                            },
+                          ),
+                        ),
+                        Padding(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 15),
+                              vertical: 5, horizontal: 8),
                           child: Container(
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
@@ -270,8 +377,10 @@ class _EditProfileState extends State<EditProfile> {
                                           onTap: () async {
                                             var selected = await showDatePicker(
                                                 context: context,
-                                                firstDate: DateTime.now(),
-                                                initialDate: DateTime.now(),
+                                                firstDate:
+                                                    DateTime(1968, 01, 01),
+                                                initialDate:
+                                                    DateTime(2000, 01, 01),
                                                 lastDate: DateTime(2030, 1, 1));
 
                                             if (selected != null) {
@@ -308,21 +417,8 @@ class _EditProfileState extends State<EditProfile> {
                                               await loginUserState(context);
 
                                               Navigator.pop(context);
-                                              List<String> dobList =
-                                                  dob.split("-");
-
-                                              DateTime schedule = DateTime(
-                                                int.parse(dobList[0]),
-                                                int.parse(dobList[1]),
-                                                int.parse(dobList[2]),
-                                              );
-                                              print("DATE $schedule");
-                                              await controller
-                                                  .showScheduleNotification(
-                                                      'Happy Birthday',
-                                                      'Elive Wishes you a very happy birthday',
-                                                      dateTime: schedule);
-                                              showToast("Saved", Colors.green);
+                                              await setScheduleNotificationForBirthDay(
+                                                  dob, controller);
                                             } else {
                                               showToast(
                                                   "Name should have at least 3 characters",

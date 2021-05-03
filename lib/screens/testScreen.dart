@@ -1,4 +1,4 @@
-import 'package:elive/controllers/notificationController.dart';
+import 'package:elive/controllers/localNotificationController.dart';
 import 'package:flutter/material.dart';
 
 class TestScreen extends StatefulWidget {

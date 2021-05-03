@@ -1,12 +1,16 @@
 import 'dart:convert';
 
 import 'package:elive/controllers/apiController.dart';
+import 'package:elive/stateMangement/booking_bloc/bookingCubit.dart';
+import 'package:elive/stateMangement/booking_bloc/bookingState.dart';
+import 'package:elive/stateMangement/models/booking.dart';
 import 'package:elive/stateMangement/models/bookingList.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
 import 'package:elive/utils/bookingCard.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:elive/utils/header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({Key key}) : super(key: key);
@@ -15,7 +19,6 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  bool isLoading = true;
   List<Widget> bookWidgets = [];
   @override
   void initState() {
@@ -26,37 +29,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
   setBookings() async {
     await init();
-    BookingList bookings = await ApiController.getBookings();
-    String usrString = preferences.getString(SPS.user.toString());
-    MyUser user = MyUser.fromJson(json.decode(usrString));
-    String bookingText = "You have no bookings";
-    bookWidgets.add(Header(title: "My Bookings"));
-
-    for (var book in bookings.records) {
-      if (book.userEmail == user.email) {
-        bookingText = "Following are you booking details";
-        bookWidgets.add(BookingCard(
-          id: book.id,
-          price: book.total,
-          time: book.time,
-          date: book.date,
-        ));
-      }
-    }
-    bookWidgets.insert(
-        1,
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                "$bookingText",
-                style: TextStyle(fontSize: 16),
-              )),
-        ));
-    setState(() {
-      isLoading = false;
-    });
+    await BlocProvider.of<BookingCubit>(context).getBookings();
   }
 
   @override
@@ -67,28 +40,128 @@ class _BookingScreenState extends State<BookingScreen> {
           Opacity(
             opacity: 0.05,
             child: Image.asset(
-              "assets/images/bg.png",
+              "assets/images/bg.jpeg",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
             ),
           ),
           SingleChildScrollView(
-            child: Column(
-              children: [
-                if (isLoading)
-                  Column(
-                    children: [
+            child: BlocBuilder<BookingCubit, BookingState>(
+                builder: (context, state) {
+              if (state is BookingInitialState) {
+                return Text(
+                  "Loading...",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400),
+                );
+              } else if (state is BookingLoadingState) {
+                return Text(
+                  "Loading...",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400),
+                );
+              } else if (state is BookingLoadedState) {
+                if (state.bookings == null) {
+                  return Text(
+                    "Loading...",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400),
+                  );
+                } else {
+                  List<Widget> cartItemWidgets = [];
+                  if (state.bookings.records == null ||
+                      state.bookings.records.length == 0) {
+                    cartItemWidgets = [
                       Header(title: "My Bookings"),
                       Padding(
-                        padding: const EdgeInsets.only(top: 150),
-                        child: loader(),
-                      ),
-                    ],
-                  ),
-                if (!isLoading) Column(children: bookWidgets)
-              ],
-            ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('You do not have any bookings'),
+                      )
+                    ];
+                  } else {
+                    bookWidgets = [];
+                    BookingList bookings = state.bookings;
+                    String usrString =
+                        preferences.getString(SPS.user.toString());
+                    MyUser user = MyUser.fromJson(json.decode(usrString));
+                    String bookingText = "You have no bookings";
+                    bookWidgets.add(Header(title: "My Bookings"));
+
+                    for (int i = bookings.records.length - 1; i >= 0; i--) {
+                      var book = bookings.records[i];
+                      if (book.firestoreId == user.uid ||
+                          book.userEmail == user.email) {
+                        bookingText = "Following are you booking details";
+                        bookWidgets.add(BookingCard(
+                            status: book.status,
+                            id: book.id,
+                            price: book.total,
+                            time: book.time,
+                            date: book.date,
+                            email: user.email));
+                      }
+                    }
+                    bookWidgets.insert(
+                        1,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "$bookingText",
+                                style: TextStyle(fontSize: 16),
+                              )),
+                        ));
+
+                    return Column(children: bookWidgets);
+                  }
+                  return Scaffold(
+                    body: Stack(
+                      children: [
+                        Opacity(
+                          opacity: 0.05,
+                          child: Image.asset(
+                            "assets/images/bg.jpeg",
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SingleChildScrollView(
+                          child: Column(
+                            children: cartItemWidgets,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } else if (state is BookingErrorState) {
+                return Text(
+                  "Loading...",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400),
+                );
+              } else {
+                return Text(
+                  "User not loaded",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400),
+                );
+              }
+            }),
           ),
         ],
       ),

@@ -29,9 +29,10 @@ class BookingListRecords {
   String total;
   String date;
   String service;
-
+  String status;
   BookingListRecords(
       {this.id,
+      this.status,
       this.firestoreId,
       this.userEmail,
       this.time,
@@ -47,6 +48,7 @@ class BookingListRecords {
     total = json['total'];
     date = json['date'];
     service = json['service'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -58,6 +60,7 @@ class BookingListRecords {
     data['total'] = this.total;
     data['date'] = this.date;
     data['service'] = this.service;
+    data['status'] = this.status;
     return data;
   }
 }

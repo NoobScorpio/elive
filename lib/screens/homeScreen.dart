@@ -1,17 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:elive/controllers/apiController.dart';
 import 'package:elive/controllers/cartController.dart';
-import 'package:elive/controllers/notificationController.dart';
+import 'package:elive/controllers/localNotificationController.dart';
+import 'package:elive/controllers/pushNotificationController.dart';
 import 'package:elive/screens/itemsScreen.dart';
 import 'package:elive/screens/profileScreen.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
 import 'package:elive/stateMangement/category_bloc/categoryState.dart';
+import 'package:elive/stateMangement/slider_bloc/sliderCubit.dart';
+import 'package:elive/stateMangement/slider_bloc/sliderState.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userState.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -26,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await init();
     await loginUserState(context);
     await BlocProvider.of<CategoryCubit>(context).getCategory();
+    await BlocProvider.of<SliderCubit>(context).getImages();
     setState(() {
       loading = false;
     });
@@ -40,12 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) => setUser());
-    List<String> images = [
-      'assets/images/saloon.jpg',
-      'assets/images/saloon.jpg',
-      'assets/images/saloon.jpg',
-    ];
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return loading
@@ -57,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Opacity(
                   opacity: 0.05,
                   child: Image.asset(
-                    "assets/images/bg.png",
+                    "assets/images/bg.jpeg",
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.cover,
@@ -116,6 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             fontWeight: FontWeight.w400),
                                       );
                                     } else {
+                                      //TODO: CHANGE LOCATION IF PROBLEM OCCUR
+                                      PushNotificationController()
+                                          .registerNotification();
                                       try {
                                         return Row(
                                           crossAxisAlignment:
@@ -242,88 +246,146 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: headerText,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.check_circle_outline,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  "Home",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              width: 25,
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.check_circle_outline,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  "Saloon",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 150,
-                          child: Swiper(
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Card(
-                                color: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                elevation: 6,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                          'assets/images/hairstyle.jpg',
+
+                      BlocBuilder<SliderCubit, SliderState>(
+                          builder: (context, state) {
+                        if (state is SliderInitialState) {
+                          return Text(
+                            "Loading...",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          );
+                        } else if (state is SliderLoadingState) {
+                          return Text(
+                            "Loading...",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          );
+                        } else if (state is SliderLoadedState) {
+                          if (state.images == null) {
+                            return Text(
+                              "Loading...",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            );
+                          } else {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 150,
+                                child: Swiper(
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    String img = '$imageURL' +
+                                        '/' +
+                                        '${state.images.records[index].image}';
+                                    return CachedNetworkImage(
+                                      imageUrl: img,
+                                      imageBuilder: (context, image) => Card(
+                                        color: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
                                         ),
-                                        fit: BoxFit.cover),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15)),
-                                  ),
+                                        elevation: 6,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            image: DecorationImage(
+                                                image: NetworkImage(img),
+                                                fit: BoxFit.cover),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15)),
+                                          ),
+                                        ),
+                                      ),
+                                      progressIndicatorBuilder:
+                                          (context, img, progress) => Card(
+                                        color: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                        ),
+                                        elevation: 6,
+                                        child: Container(
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              value: progress.progress,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      errorWidget: (context, img, err) => Card(
+                                        color: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                        ),
+                                        elevation: 6,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.error_outline,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                    Card(
+                                      color: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      elevation: 6,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                '$imageURL' +
+                                                    '/' +
+                                                    '${state.images.records[index].image}',
+                                              ),
+                                              fit: BoxFit.cover),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: state.images.records.length,
+                                  viewportFraction: 0.65,
+                                  scale: 0.80,
                                 ),
-                              );
-                            },
-                            itemCount: 3,
-                            viewportFraction: 0.65,
-                            scale: 0.80,
-                          ),
-                        ),
-                      ),
+                              ),
+                            );
+                          }
+                        } else if (state is SliderErrorState) {
+                          return Text(
+                            "Loading...",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          );
+                        } else {
+                          return Text(
+                            "Slider not loaded",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          );
+                        }
+                      }),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 10),
@@ -436,7 +498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 15,
                       ),
                       Container(
-                        height: 150,
+                        height: 260,
                         width: width,
                         decoration: BoxDecoration(
                             color: Colors.black,
@@ -448,32 +510,135 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: CircleAvatar(
+                                      radius: 28,
+                                      backgroundImage:
+                                          AssetImage('assets/images/logo.jpeg'),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Elive Beauty Spot',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                                mainAxisAlignment: MainAxisAlignment.start,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '+966-86947583',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          'Mobile | United Arab Emirates',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor: Colors.green,
+                                          child: IconButton(
+                                            color: Colors.white,
+                                            icon: Icon(Icons.call),
+                                            onPressed: () {
+                                              _launchURL("tel:+96686947583");
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: 5.0),
+                                        CircleAvatar(
+                                          backgroundColor: Colors.red,
+                                          child: IconButton(
+                                            color: Colors.white,
+                                            icon: Icon(Icons.message),
+                                            onPressed: () {
+                                              _launchURL(
+                                                  "sms:+96686947583?body=How can we be of service? ");
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Elive Beauty Spot',
-                                  style: TextStyle(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
                                       color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w500),
+                                      icon: FaIcon(
+                                        FontAwesomeIcons.facebook,
+                                        size: 35,
+                                        color: Colors.blueAccent,
+                                      ),
+                                      onPressed: () {
+                                        _launchURL("https://facebook.com/");
+                                      },
+                                    ),
+                                    SizedBox(width: 5.0),
+                                    IconButton(
+                                      color: Colors.white,
+                                      icon: FaIcon(
+                                        FontAwesomeIcons.instagram,
+                                        size: 36,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {
+                                        _launchURL("https://www.instagram.com");
+                                      },
+                                    ),
+                                    SizedBox(width: 5.0),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: IconButton(
+                                        color: Colors.white,
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.tiktok,
+                                          size: 30,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          _launchURL("https://www.tiktok.com/");
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Text(
-                                'Saloon near Burj Khalifa, Centaurys Road',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
+                                "All rights reserved",
+                                style: TextStyle(color: Colors.grey),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Contact: 96686947583',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
+                              Text(
+                                "Copyrights © 2021",
+                                style: TextStyle(color: Colors.grey),
                               ),
                             ],
                           ),
@@ -485,5 +650,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           );
+  }
+
+  _launchURL(link) async {
+    try {
+      if (await canLaunch(link)) {
+        await launch(link);
+      }
+    } catch (e) {
+      // print(e);
+      // print('Could not launch $link');
+    }
   }
 }

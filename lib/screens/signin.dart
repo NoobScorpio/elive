@@ -7,6 +7,7 @@ import 'package:elive/screens/signUp.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
 import 'package:elive/stateMangement/models/myUser.dart';
+import 'package:elive/stateMangement/slider_bloc/sliderCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:elive/utils/header.dart';
@@ -33,7 +34,7 @@ class _SignInScreenState extends State<SignInScreen> {
           Opacity(
             opacity: 0.1,
             child: Image.asset(
-              "assets/images/bg.png",
+              "assets/images/bg.jpeg",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -106,6 +107,90 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 SizedBox(
+                  height: 10,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: InkWell(
+                      onTap: () {
+                        var resetEmail = '';
+                        showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => AlertDialog(
+                                  title: Text("Reset Password"),
+                                  content: TextField(
+                                    keyboardType: TextInputType.emailAddress,
+                                    cursorColor: Colors.black,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter email',
+                                      border: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.grey)),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.black)),
+                                    ),
+                                    onChanged: (val) {
+                                      resetEmail = val.toString();
+                                    },
+                                  ),
+                                  actions: [
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "Cancel",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () async {
+                                        showDialog(
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (_) => loader());
+                                        bool reset =
+                                            await auth.sendPasswordResetEmail(
+                                                email: resetEmail);
+                                        if (reset) {
+                                          showToast("Email sent", Colors.green);
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        } else {
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          "Send",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ));
+                      },
+                      child: Text(
+                        "Forgot password?",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
                   height: 20,
                 ),
                 InkWell(
@@ -147,6 +232,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                         BlocProvider<CategoryCubit>(
                                             create: (context) =>
                                                 CategoryCubit()),
+                                        BlocProvider<SliderCubit>(
+                                            create: (context) => SliderCubit()),
                                         BlocProvider<CartCubit>(
                                             create: (context) => CartCubit(
                                                 cartRepository:
@@ -185,7 +272,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 InkWell(
                   onTap: () async {
@@ -215,6 +302,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                     ),
                                     BlocProvider<CategoryCubit>(
                                         create: (context) => CategoryCubit()),
+                                    BlocProvider<SliderCubit>(
+                                        create: (context) => SliderCubit()),
                                     BlocProvider<CartCubit>(
                                         create: (context) => CartCubit(
                                             cartRepository:
@@ -234,6 +323,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             children: [
                               CircleAvatar(
                                 radius: 15,
+                                backgroundColor: Colors.transparent,
                                 backgroundImage:
                                     AssetImage('assets/images/google.png'),
                               ),
@@ -297,7 +387,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                                   "Sending code", Colors.blue);
                                               await auth.verifyPhone(
                                                   number: phone.text);
-                                              Navigator.pop(context);
                                             },
                                             child: Icon(Icons.send)),
                                         hintText: 'Enter Phone No.',
@@ -364,13 +453,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                       Navigator.pop(context);
                                       showToast("Please try again", Colors.red);
                                     } else {
-                                      await preferences.setString(
-                                          SPS.user.toString(),
-                                          json.encode(user.toJson()));
-                                      await preferences.setBool(
-                                          SPS.loggedIn.toString(), true);
-                                      await preferences.setBool(
-                                          SPS.phoneLogIn.toString(), true);
                                       Navigator.pop(context);
                                       showToast("Success", Colors.green);
                                       Navigator.pushAndRemoveUntil(
@@ -385,6 +467,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                                     BlocProvider<CategoryCubit>(
                                                         create: (context) =>
                                                             CategoryCubit()),
+                                                    BlocProvider<SliderCubit>(
+                                                        create: (context) =>
+                                                            SliderCubit()),
                                                     BlocProvider<CartCubit>(
                                                         create: (context) =>
                                                             CartCubit(

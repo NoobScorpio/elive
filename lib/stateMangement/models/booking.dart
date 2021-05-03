@@ -6,9 +6,13 @@ class Booking {
   String date;
   String service;
   int total;
+  String status;
+  String token;
 
   Booking(
       {this.userEmail,
+      this.token,
+      this.status,
       this.description,
       this.time,
       this.firestoreId,
@@ -24,6 +28,8 @@ class Booking {
     date = json['date'];
     service = json['service'];
     total = json['total'];
+    token = json['token'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -35,6 +41,8 @@ class Booking {
     data['date'] = this.date;
     data['service'] = this.service;
     data['total'] = this.total;
+    data['token'] = this.token;
+    data['status'] = this.status;
     return data;
   }
 }

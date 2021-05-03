@@ -48,7 +48,7 @@ class _SupportScreenState extends State<SupportScreen> {
           Opacity(
             opacity: 0.05,
             child: Image.asset(
-              "assets/images/bg.png",
+              "assets/images/bg.jpeg",
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -113,7 +113,7 @@ class _SupportScreenState extends State<SupportScreen> {
                         width: 120,
                         child: RaisedButton(
                           onPressed: () async {
-                            showToast("Sending Email",Colors.green);
+                            showToast("Sending Email", Colors.green);
                             final message = Message()
                               ..from = Address(username, 'Elive')
                               ..recipients.add('elivebeautyspotdubai@gmail.com')

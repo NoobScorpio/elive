@@ -3,8 +3,10 @@ import 'package:elive/screens/bottomNavBar.dart';
 import 'package:elive/screens/homeScreen.dart';
 import 'package:elive/screens/onboard.dart';
 import 'package:elive/screens/signin.dart';
+import 'package:elive/stateMangement/booking_bloc/bookingCubit.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/category_bloc/categoryCubit.dart';
+import 'package:elive/stateMangement/slider_bloc/sliderCubit.dart';
 import 'package:elive/stateMangement/user_bloc/userLogInCubit.dart';
 import 'package:elive/utils/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
       home: MultiBlocProvider(providers: [
         BlocProvider<UserCubit>(create: (context) => UserCubit()),
         BlocProvider<CategoryCubit>(create: (context) => CategoryCubit()),
+        BlocProvider<SliderCubit>(create: (context) => SliderCubit()),
+        BlocProvider<BookingCubit>(create: (context) => BookingCubit()),
         BlocProvider<CartCubit>(
             create: (context) =>
                 CartCubit(cartRepository: CartRepositoryImpl())),

@@ -12,23 +12,23 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 
 class Authenticate {
-  final fbLogin = FacebookLogin();
+  // final fbLogin = FacebookLogin();
   FirebaseAuth auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final Database db = Database();
   String phoneVerificationID;
 
-  Future signInFB() async {
-    final FacebookLoginResult result =
-        await fbLogin.logIn(permissions: [FacebookPermission.email]);
-    print("@FB LOGIN $result");
-    final String token = result.accessToken.token;
-    final response = await http.get(Uri.parse(
-        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=$token'));
-    final profile = jsonDecode(response.body);
-    print(profile);
-    return profile;
-  }
+  // Future signInFB() async {
+  //   final FacebookLoginResult result =
+  //       await fbLogin.logIn(permissions: [FacebookPermission.email]);
+  //   print("@FB LOGIN $result");
+  //   final String token = result.accessToken.token;
+  //   final response = await http.get(Uri.parse(
+  //       'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=$token'));
+  //   final profile = jsonDecode(response.body);
+  //   print(profile);
+  //   return profile;
+  // }
 
   Future signOut(context) async {
     await init();
@@ -41,9 +41,20 @@ class Authenticate {
     await auth.signOut();
   }
 
+  Future<bool> sendPasswordResetEmail({email}) async {
+    try {
+      await auth.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      showToast("$e", Colors.red);
+      return false;
+    }
+  }
+
   Future<MyUser> signUpWithPhoneCredentials(
       {code, phoneVerificationID, name, dob}) async {
     try {
+      db.userCollection.get();
       PhoneAuthCredential cred = PhoneAuthProvider.credential(
           verificationId: phoneVerificationID, smsCode: code);
 

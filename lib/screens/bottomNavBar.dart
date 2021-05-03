@@ -1,6 +1,7 @@
 import 'package:elive/screens/bookingScreen.dart';
 import 'package:elive/screens/cartScreen.dart';
 import 'package:elive/screens/homeScreen.dart';
+import 'package:elive/stateMangement/booking_bloc/bookingCubit.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/models/cart.dart';
 import 'package:elive/utils/constants.dart';
@@ -32,7 +33,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
       HomeScreen(),
-      BookingScreen(),
+      BlocProvider<BookingCubit>(
+          create: (context) => BookingCubit(), child: BookingScreen()),
       CartScreen(),
     ];
     return Scaffold(

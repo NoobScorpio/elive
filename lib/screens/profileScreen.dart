@@ -86,7 +86,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Opacity(
                   opacity: 0.05,
                   child: Image.asset(
-                    "assets/images/bg.png",
+                    "assets/images/bg.jpeg",
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.cover,
@@ -185,12 +185,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           padding: const EdgeInsets.all(1.0),
                                           child: CircleAvatar(
                                             radius: 50,
-                                            backgroundImage:
-                                                state.user.photoUrl == ""
-                                                    ? AssetImage(
-                                                        'assets/images/face.jpg')
-                                                    : NetworkImage(
-                                                        state.user.photoUrl),
+                                            backgroundImage: state
+                                                        .user.photoUrl ==
+                                                    ""
+                                                ? AssetImage(
+                                                    'assets/images/avatar.png')
+                                                : NetworkImage(
+                                                    state.user.photoUrl),
                                           ),
                                         ),
                                       ),
@@ -261,76 +262,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                               ),
-                              if (googleLogin || emailLogin)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 2),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.send,
-                                            size: 20,
-                                            color: Colors.teal,
+
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 2),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.send,
+                                          size: 20,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Email",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Email",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text("${state.user.email}",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500))
-                                    ],
-                                  ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                        "${state.user.email == "" ? "N/A" : state.user.email}",
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500))
+                                  ],
                                 ),
-                              if (phoneLogin)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 2),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.phone,
-                                            size: 20,
-                                            color: Colors.teal,
+                              ),
+                              // if (phoneLogin)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 2),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.phone,
+                                          size: 20,
+                                          color: Colors.blueAccent,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Phone",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Phone",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text("${state.user.phone}",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500))
-                                    ],
-                                  ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                        "${state.user.phone == "" ? "N/A" : state.user.phone}",
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500))
+                                  ],
                                 ),
+                              ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0, vertical: 2),
@@ -357,7 +360,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ],
                                     ),
-                                    Text("${state.user.dob ?? "N/A"}",
+                                    Text(
+                                        "${state.user.dob == "" ? "N/A" : state.user.dob}",
                                         style: TextStyle(
                                             color: Colors.grey,
                                             fontSize: 16,

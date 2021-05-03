@@ -27,11 +27,12 @@ class ItemRecords {
   String itemPrice;
   String packageId;
   String itemPicture;
-
+  String timeRequire;
   ItemRecords(
       {this.itemId,
       this.itemName,
       this.itemPrice,
+      this.timeRequire,
       this.packageId,
       this.itemPicture});
 
@@ -41,6 +42,7 @@ class ItemRecords {
     itemPrice = json['itemPrice'];
     packageId = json['packageId'];
     itemPicture = json['itemPicture'];
+    timeRequire = json['timeRequire'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,6 +52,7 @@ class ItemRecords {
     data['itemPrice'] = this.itemPrice;
     data['packageId'] = this.packageId;
     data['itemPicture'] = this.itemPicture;
+    data['timeRequire'] = this.timeRequire;
     return data;
   }
 }
