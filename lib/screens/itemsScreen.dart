@@ -187,14 +187,18 @@ class _ItemsScreenState extends State<ItemsScreen> {
             }, builder: (context, state) {
               if (state is CartInitialState) {
                 return InkWell(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    bool deleted = await Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => BlocProvider(
                                 create: (context) => CartCubit(
                                     cartRepository: CartRepositoryImpl()),
                                 child: CartScreen(item: true))));
+                    if (deleted != null) {
+                      await BlocProvider.of<CartCubit>(context).emptyCart();
+                      Navigator.pop(context, true);
+                    }
                   },
                   child: Stack(
                     children: [
@@ -250,14 +254,18 @@ class _ItemsScreenState extends State<ItemsScreen> {
               } else if (state is CartLoadedState) {
                 print('LOADED ${state.qty}');
                 return InkWell(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    bool deleted = await Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => BlocProvider(
                                 create: (context) => CartCubit(
                                     cartRepository: CartRepositoryImpl()),
                                 child: CartScreen(item: true))));
+                    if (deleted != null) {
+                      await BlocProvider.of<CartCubit>(context).emptyCart();
+                      Navigator.pop(context, true);
+                    }
                   },
                   child: Stack(
                     children: [

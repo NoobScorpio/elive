@@ -50,30 +50,12 @@ class _BookingScreenState extends State<BookingScreen> {
             child: BlocBuilder<BookingCubit, BookingState>(
                 builder: (context, state) {
               if (state is BookingInitialState) {
-                return Text(
-                  "Loading...",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400),
-                );
+                return loader();
               } else if (state is BookingLoadingState) {
-                return Text(
-                  "Loading...",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400),
-                );
+                return loader();
               } else if (state is BookingLoadedState) {
                 if (state.bookings == null) {
-                  return Text(
-                    "Loading...",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400),
-                  );
+                  return loader();
                 } else {
                   List<Widget> cartItemWidgets = [];
                   if (state.bookings.records == null ||
@@ -145,13 +127,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   );
                 }
               } else if (state is BookingErrorState) {
-                return Text(
-                  "Loading...",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400),
-                );
+                return loader();
               } else {
                 return Text(
                   "User not loaded",

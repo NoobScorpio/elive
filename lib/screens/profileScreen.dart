@@ -628,6 +628,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              Text("Designed & Developed By"),
+                              Text("Techsigmas company (www.techsigmas.com)"),
+                              SizedBox(
+                                height: 10,
+                              ),
                             ],
                           );
                         }

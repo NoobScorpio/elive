@@ -13,7 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
@@ -46,6 +46,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     "08:00 PM",
   ];
   String saloonTimeSelected = "Not Set";
+  var bookings;
   String serviceSelected = "Saloon";
   String _date = 'Not Set';
   String _time = "Not Set";
@@ -65,6 +66,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     smtpServer = gmail(username, password);
     controller.setOnNotificationReceive(onNotificationReceive);
     controller.setOnNotificationClick(onNotificationClick);
+    getBookings();
+  }
+
+  getBookings() async {
+    bookings = await ApiController.getBookings();
   }
 
   onNotificationReceive(ReceiveNotification noti) {
@@ -156,7 +162,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         left: 18.0, right: 18, top: 0, bottom: 10),
                     child: Text(
                       'Please be informed, on selecting the Home Service, additional '
-                      '120 AED will be added in total cart value',
+                      '70 AED will be added in total cart value',
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
@@ -164,15 +170,60 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: () async {
+                      List<String> newList = [
+                        "Not Set",
+                        "09:00 AM",
+                        "10:00 AM",
+                        "11:00 AM",
+                        "12:00 PM",
+                        "01:00 PM",
+                        "02:00 PM",
+                        "03:00 PM",
+                        "04:00 PM",
+                        "05:00 PM",
+                        "06:00 PM",
+                        "07:00 PM",
+                        "08:00 PM",
+                      ];
+                      var copyList = newList;
                       date = await showDatePicker(
-                          context: context,
-                          firstDate: DateTime.now(),
-                          initialDate: DateTime.now(),
-                          lastDate: DateTime(2030, 1, 1));
+                              context: context,
+                              firstDate: DateTime.now(),
+                              initialDate: DateTime.now(),
+                              lastDate: DateTime(2030, 1, 1)) ??
+                          DateTime.now();
+                      showDialog(context: context, builder: (c) => loader());
+
+                      bool contains = false;
+                      for (var book in bookings.records) {
+                        var bookTime = book.time.split(":")[0] +
+                            ":" +
+                            book.time.split(":")[1];
+                        if (book.date.contains(date.toString().split(' ')[0])) {
+                          for (int i = 0; i < newList.length; i++) {
+                            if (newList[i].contains(bookTime)) {
+                              setState(() {
+                                newList.removeAt(i);
+                              });
+                            }
+                          }
+                          contains = true;
+                        }
+                      }
+                      if (!contains) {
+                        setState(() {
+                          newList = copyList;
+                        });
+                      }
+
                       selectedDate = date;
                       setState(() {
                         _date = date.toString().split(' ')[0];
+                        saloonTimes = newList;
+                        saloonTimeSelected = "Not Set";
+                        _time = "Not Set";
                       });
+                      Navigator.pop(context);
                     },
                     child: Container(
                       alignment: Alignment.center,
@@ -401,7 +452,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           style: headerText,
                         ),
                         Text(
-                          '120.0',
+                          'AED 70.0',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
@@ -440,15 +491,17 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       ),
                       if (serviceSelected == 'Saloon')
                         Text(
-                          promoBool ? '${total - promoPrice}' : '$total',
+                          promoBool
+                              ? 'AED ${total - promoPrice}'
+                              : 'AED $total',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       if (serviceSelected == 'Home')
                         Text(
                           promoBool
-                              ? '${total + 120 - promoPrice}'
-                              : '${total + 120}',
+                              ? 'AED ${total + 70 - promoPrice}'
+                              : 'AED ${total + 70}',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
@@ -492,19 +545,41 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                               showToast("Redirecting", Colors.green);
                               int finalTotal = (promoBool
                                       ? (serviceSelected == 'Home'
-                                          ? total - promoPrice + 120
+                                          ? total - promoPrice + 70
                                           : total - promoPrice)
                                       : (serviceSelected == 'Home'
-                                          ? total + 120
+                                          ? total + 70
                                           : total))
                                   .toInt();
+                              double sendingPrice = finalTotal.toDouble();
+                              try {
+                                var response =
+                                    await http.get(Uri.parse(exchangeAPI));
+                                if (response.statusCode == 200 ||
+                                    response.statusCode == 201) {
+                                  double rate = json
+                                      .decode(response.body)["conversion_rate"];
+                                  sendingPrice = sendingPrice * rate;
+                                } else {
+                                  showToast(
+                                      "Could not get AED to USD conversion rate",
+                                      Colors.red);
+                                }
+                              } catch (e) {
+                                showToast(
+                                    "Could not get AED to USD conversion rate",
+                                    Colors.red);
+                                print("RESPONSE ERROR");
+                                print(e);
+                              }
                               bool payedPrice = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => PaymentScreen(
-                                            price: finalTotal,
+                                            price: sendingPrice,
                                             email: user.email,
                                           )));
+                              // bool payedPrice = true;
                               if (payedPrice != null && payedPrice == true) {
                                 Booking booking = Booking(
                                     userEmail:
@@ -530,6 +605,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                       '${widget.desc}\n'
                                       'Total charges: $total\n\n'
                                       'Thank you !!';
+
                                   final message = Message()
                                     ..from = Address(username, 'Elive')
                                     ..recipients.add(user.email)
@@ -605,7 +681,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                           dateTime: schedule);
                                     }
                                   }
-                                  print("EMPTY CART");
+                                  // print("EMPTY CART");
                                   Navigator.pop(context);
                                   Navigator.pop(context, true);
                                   showToast("Booked", Colors.green);
@@ -636,6 +712,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           ),
         ],
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //
+      //   },
+      // ),
     );
   }
 }

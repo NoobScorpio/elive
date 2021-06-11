@@ -1,3 +1,4 @@
+import 'package:elive/controllers/apiController.dart';
 import 'package:elive/screens/checkoutScreen.dart';
 import 'package:elive/stateMangement/cart_bloc/cartCubit.dart';
 import 'package:elive/stateMangement/cart_bloc/cartState.dart';
@@ -209,7 +210,7 @@ class _CartScreenState extends State<CartScreen> {
                                   builder: (BuildContext context,
                                           StateSetter setStates) =>
                                       Container(
-                                    height: 130,
+                                    height: 140,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -219,28 +220,40 @@ class _CartScreenState extends State<CartScreen> {
                                         Text(
                                           "Please be informed, if order cancelled before taking the service, "
                                           "20% of cancellation charges will be deducted from total cart value at the "
-                                          "time for the refund",
-                                          style: TextStyle(color: Colors.red),
+                                          "time for the refund.\n*AED price will be converted to USD",
+                                          style: TextStyle(
+                                              color: Colors.red, fontSize: 14),
                                         ),
                                         SizedBox(
-                                          height: 5,
+                                          height: 15,
                                         ),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            Checkbox(
-                                                value: isCheck,
-                                                onChanged: (val) =>
-                                                    setStates(() {
-                                                      isCheck = val;
-                                                    })),
+                                            InkWell(
+                                                onTap: () {
+                                                  setStates(() {
+                                                    isCheck = !isCheck;
+                                                  });
+                                                },
+                                                child: isCheck
+                                                    ? Icon(
+                                                        Icons.check_circle,
+                                                        color: Colors.redAccent,
+                                                      )
+                                                    : Icon(
+                                                        Icons
+                                                            .check_circle_outline,
+                                                        color: Colors.redAccent,
+                                                      )),
                                             SizedBox(
                                               width: 5,
                                             ),
                                             Text(
                                               "Do you agree?",
                                               style: TextStyle(
+                                                  fontSize: 16,
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w600),
                                             ),
@@ -282,6 +295,8 @@ class _CartScreenState extends State<CartScreen> {
                                               qty: names[item],
                                             ));
                                           }
+
+                                          // print(bookings.records.length);
                                           print(description);
                                           bool booked = await Navigator.push(
                                               context,
@@ -324,6 +339,8 @@ class _CartScreenState extends State<CartScreen> {
                         if (delete) {
                           print("@DELETED");
                           await BlocProvider.of<CartCubit>(context).emptyCart();
+
+                          if (widget.item != null) Navigator.pop(context, true);
                         }
                       },
                       child: Text(

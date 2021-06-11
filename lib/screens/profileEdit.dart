@@ -40,6 +40,8 @@ class _EditProfileState extends State<EditProfile> {
     await init();
     name.text = user.name;
     pass.text = user.password;
+    phone.text = user.phone;
+    email.text = user.email;
     dob = user.dob == '' || user.dob == null ? stockDate : user.dob;
     await loginUserState(context);
   }

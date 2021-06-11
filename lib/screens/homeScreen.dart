@@ -467,9 +467,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
-                                childAspectRatio: width < 390
-                                    ? (height < 750 ? 2 / 2.85 : 2 / 2.9)
-                                    : 2 / 2.525,
+                                mainAxisExtent: 230,
+                                // childAspectRatio: width < 390
+                                //     ? (height < 750 ? 2 / 2.85 : 2 / 2.9)
+                                //     : 2 / 2.525,
                               ),
                               itemBuilder: (context, index) => widgets[index],
                               shrinkWrap: true,
@@ -498,7 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 15,
                       ),
                       Container(
-                        height: 260,
+                        // height: 260,
                         width: width,
                         decoration: BoxDecoration(
                             color: Colors.black,
@@ -539,7 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          '+966-86947583',
+                                          '+971-527308400',
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -565,7 +566,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: Colors.white,
                                             icon: Icon(Icons.call),
                                             onPressed: () {
-                                              _launchURL("tel:+96686947583");
+                                              _launchURL("tel:+971527308400");
                                             },
                                           ),
                                         ),
@@ -577,7 +578,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             icon: Icon(Icons.message),
                                             onPressed: () {
                                               _launchURL(
-                                                  "sms:+96686947583?body=How can we be of service? ");
+                                                  "sms:+971527308400?body=How can we be of service? ");
                                             },
                                           ),
                                         ),
@@ -614,30 +615,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                         _launchURL("https://www.instagram.com");
                                       },
                                     ),
-                                    SizedBox(width: 5.0),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: IconButton(
-                                        color: Colors.white,
-                                        icon: FaIcon(
-                                          FontAwesomeIcons.tiktok,
-                                          size: 30,
-                                          color: Colors.white,
-                                        ),
-                                        onPressed: () {
-                                          _launchURL("https://www.tiktok.com/");
-                                        },
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ),
                               Text(
-                                "All rights reserved",
+                                "All rights reserved. Copyrights © 2021",
                                 style: TextStyle(color: Colors.grey),
                               ),
                               Text(
-                                "Copyrights © 2021",
+                                "",
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ],

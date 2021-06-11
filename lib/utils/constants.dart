@@ -19,6 +19,9 @@ String username = 'elivebeautyspotdubai@gmail.com';
 String password = 'elivebeautyspot@123';
 const baseURL = 'https://elivebeautyspot.in/admin/api/package';
 const imageURL = 'https://elivebeautyspot.in/admin/upload';
+const exchangeKey = "ffa2d673409fbab701b15504";
+const exchangeAPI =
+    'https://v6.exchangerate-api.com/v6/$exchangeKey/pair/AED/USD';
 enum SPS {
   firstOpen,
   loggedIn,
@@ -52,8 +55,8 @@ Widget getCard({title, image, height, width, special}) {
         CachedNetworkImage(
           imageUrl: image,
           imageBuilder: (context, image) => Container(
-            width: special == null ? width * 0.45 : width * 0.9,
-            height: special == null ? 175 : 145,
+            width: width * 0.45,
+            height: 175,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(15), topRight: Radius.circular(15)),
@@ -61,8 +64,8 @@ Widget getCard({title, image, height, width, special}) {
             ),
           ),
           progressIndicatorBuilder: (context, img, progress) => Container(
-            width: special == null ? width * 0.422 : width * 0.9,
-            height: special == null ? 175 : 145,
+            width: width * 0.422,
+            height: 175,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(15), topRight: Radius.circular(15)),
@@ -78,8 +81,8 @@ Widget getCard({title, image, height, width, special}) {
             ),
           ),
           errorWidget: (context, img, err) => Container(
-            width: special == null ? width * 0.422 : width * 0.9,
-            height: special == null ? 175 : 145,
+            width: width * 0.422,
+            height: 175,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(15), topRight: Radius.circular(15)),
@@ -93,8 +96,8 @@ Widget getCard({title, image, height, width, special}) {
           ),
         ),
         // Container(
-        //   width: special == null ? width * 0.422 : width * 0.9,
-        //   height: special == null ? 175 : 145,
+        //   width:  width * 0.422 : width * 0.9,
+        //   height:  175 : 145,
         //   decoration: BoxDecoration(
         //     borderRadius: BorderRadius.only(
         //         topLeft: Radius.circular(15), topRight: Radius.circular(15)),
@@ -107,7 +110,7 @@ Widget getCard({title, image, height, width, special}) {
         //   ),
         // ),
         Container(
-          width: special == null ? width * 0.422 : width * 0.9,
+          width: width * 0.422,
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.only(

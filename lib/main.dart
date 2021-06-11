@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Elive',
       theme: ThemeData(
-        textTheme: GoogleFonts.karlaTextTheme(),
+        textTheme: GoogleFonts.montserratTextTheme(),
         primarySwatch: Colors.red,
       ),
       home: MultiBlocProvider(providers: [

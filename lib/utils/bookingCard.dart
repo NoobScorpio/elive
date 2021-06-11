@@ -200,28 +200,68 @@ class BookingCard extends StatelessWidget {
               //       ),
               //     ),
               //   ),
-              if (status != null && status != 'Cancelled')
+              if (status != null &&
+                  status != "Awaiting Cancellation" &&
+                  status != 'Cancelled' &&
+                  status != 'Booking Cancelled')
                 Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: InkWell(
                     onTap: () async {
-                      showDialog(
-                          context: context, builder: (context) => loader());
-
-                      if (status == "Payment Done") {
-                        Navigator.pop(context);
-                        showToast("Payout not verified", Colors.blue);
-                      } else {
-                        bool updated = await ApiController.setBookingStatus(
-                            status: "Cancelled", id: id);
-                        if (updated != null) {
-                          showToast("Booking Cancelled", Colors.green);
-                          await BlocProvider.of<BookingCubit>(context)
-                              .getBookings();
-                          Navigator.pop(context);
+                      bool cancel = await showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                content:
+                                    Text("Do you want to cancel this booking?"),
+                                actions: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                  ),
+                                ],
+                              ));
+                      if (cancel != null && cancel == true) {
+                        showDialog(
+                            context: context, builder: (context) => loader());
+                        if (status == "Payment Done") {
+                          showToast("Payout not verified", Colors.blue);
+                          bool updated = await ApiController.setBookingStatus(
+                              status: "Awaiting Cancellation", id: id);
+                          if (updated != null) {
+                            showToast("Awaiting Cancellation", Colors.green);
+                            await BlocProvider.of<BookingCubit>(context)
+                                .getBookings();
+                            Navigator.pop(context);
+                          } else {
+                            showToast("Could not cancel booking", Colors.green);
+                            Navigator.pop(context);
+                          }
                         } else {
-                          showToast("Could not cancel booking", Colors.green);
-                          Navigator.pop(context);
+                          bool updated = await ApiController.setBookingStatus(
+                              status: "Cancelled", id: id);
+                          if (updated != null) {
+                            showToast("Booking Cancelled", Colors.green);
+                            await BlocProvider.of<BookingCubit>(context)
+                                .getBookings();
+                            Navigator.pop(context);
+                          } else {
+                            showToast("Could not cancel booking", Colors.green);
+                            Navigator.pop(context);
+                          }
                         }
                       }
                     },
@@ -239,6 +279,14 @@ class BookingCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ),
+                ),
+              if (status != null && status == "Awaiting Cancellation")
+                Padding(
+                  padding: const EdgeInsets.only(top: 5, left: 15),
+                  child: Text(
+                    "*Payment will be returned within 7 days",
+                    style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ),
             ],
