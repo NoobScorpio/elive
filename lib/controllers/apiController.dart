@@ -137,7 +137,7 @@ class ApiController {
             "date": "${booking.date}",
             "service": "${booking.service}",
             "total": booking.total.toString(),
-            "status": "Payment Done",
+            "status": "Awaiting Confirmation",
             "token": "${booking.token}"
           }));
       if (response.statusCode == 200 || response.statusCode == 201) {
