@@ -197,44 +197,44 @@ class _CartScreenState extends State<CartScreen> {
                       style: TextStyle(fontSize: 18),
                     ),
                   ));
-                  cartItemWidgets.add(Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Please be informed, if order cancelled before taking the service, "
-                          "20% of cancellation charges will be deducted from total cart value at the "
-                          "time for the refund.\n*AED price will be converted to USD",
-                          style: TextStyle(color: Colors.red, fontSize: 14),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Do you agree?",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Checkbox(
-                                value: isCheck,
-                                onChanged: (val) {
-                                  setState(() {
-                                    isCheck = val;
-                                  });
-                                }),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ));
+                  // cartItemWidgets.add(Column(
+                  //   children: [
+                  //     Padding(
+                  //       padding: const EdgeInsets.all(8.0),
+                  //       child: Text(
+                  //         "Please be informed, if order cancelled before taking the service, "
+                  //         "20% of cancellation charges will be deducted from total cart value at the "
+                  //         "time for the refund.\n*AED price will be converted to USD",
+                  //         style: TextStyle(color: Colors.red, fontSize: 14),
+                  //       ),
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.all(8.0),
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.start,
+                  //         children: [
+                  //           Text(
+                  //             "Do you agree?",
+                  //             style: TextStyle(
+                  //                 fontSize: 16,
+                  //                 color: Colors.black,
+                  //                 fontWeight: FontWeight.w600),
+                  //           ),
+                  //           SizedBox(
+                  //             width: 5,
+                  //           ),
+                  //           Checkbox(
+                  //               value: isCheck,
+                  //               onChanged: (val) {
+                  //                 setState(() {
+                  //                   isCheck = val;
+                  //                 });
+                  //               }),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ));
                   cartItemWidgets.add(ElevatedButton(
                       onPressed: () async {
                         bool delete = false;
@@ -374,44 +374,44 @@ class _CartScreenState extends State<CartScreen> {
                         //         ],
                         //       );
                         //     });
-                        if (isCheck) {
-                          showDialog(
-                              context: context, builder: (context) => loader());
-                          String description = '';
+                        // if (isCheck) {
+                        showDialog(
+                            context: context, builder: (context) => loader());
+                        String description = '';
 
-                          for (var item in names.keys) {
-                            description += "${names[item]}x $item <br>";
-                            cartItemWidgets.add(CartItemCard(
-                              name: item,
-                              price: prices[item],
-                              qty: names[item],
-                            ));
-                          }
-
-                          // print(bookings.records.length);
-                          print(description);
-                          bool booked = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => BlocProvider(
-                                        create: (context) => CartCubit(),
-                                        child: CheckOutScreen(
-                                            desc: description,
-                                            names: names,
-                                            total: state.total),
-                                      )));
-                          if (booked != null && booked == true) {
-                            print("BOOKED NOT NULL");
-                            delete = true;
-                            Navigator.pop(context);
-                          } else {
-                            Navigator.pop(context);
-                          }
-                          // Navigator.pop(context);
-                        } else {
-                          showToast(
-                              "Kindly agree to the disclaimer", Colors.red);
+                        for (var item in names.keys) {
+                          description += "${names[item]}x $item <br>";
+                          cartItemWidgets.add(CartItemCard(
+                            name: item,
+                            price: prices[item],
+                            qty: names[item],
+                          ));
                         }
+
+                        // print(bookings.records.length);
+                        print(description);
+                        bool booked = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => BlocProvider(
+                                      create: (context) => CartCubit(),
+                                      child: CheckOutScreen(
+                                          desc: description,
+                                          names: names,
+                                          total: state.total),
+                                    )));
+                        if (booked != null && booked == true) {
+                          print("BOOKED NOT NULL");
+                          delete = true;
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.pop(context);
+                        }
+                        // Navigator.pop(context);
+                        // } else {
+                        //   showToast(
+                        //       "Kindly agree to the disclaimer", Colors.red);
+                        // }
                         if (delete) {
                           print("@DELETED");
                           await BlocProvider.of<CartCubit>(context).emptyCart();

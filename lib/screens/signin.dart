@@ -453,6 +453,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                       Navigator.pop(context);
                                       showToast("Please try again", Colors.red);
                                     } else {
+                                      await preferences.setString(
+                                          SPS.user.toString(),
+                                          json.encode(user.toJson()));
+                                      await preferences.setBool(
+                                          SPS.loggedIn.toString(), true);
+                                      await preferences.setBool(
+                                          SPS.phoneLogIn.toString(), true);
                                       Navigator.pop(context);
                                       showToast("Success", Colors.green);
                                       Navigator.pushAndRemoveUntil(

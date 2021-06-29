@@ -57,6 +57,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   TimeOfDay selectedTime;
   var smtpServer;
   final promo = TextEditingController();
+  final name = TextEditingController();
+  final phone = TextEditingController();
+  final location = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -509,165 +513,220 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   ),
                 ),
                 Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 18.0,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    'Confirm Details',
+                    style: headerText,
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: TextField(
+                    controller: name,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Name',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                    ),
+                    onChanged: (val) {
+                      // username = val;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: TextField(
+                    controller: phone,
+                    keyboardType: TextInputType.number,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      suffixIcon: InkWell(
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                      content: Text(
+                                          "Please enter complete number. For example, "
+                                          "if you are from Dubai enter number like "
+                                          "+971xxxxxxxx"),
+                                    ));
+                          },
+                          child: Icon(Icons.info_outline)),
+                      hintText: 'Enter Phone No.',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                    ),
+                    onChanged: (val) {
+                      // username = val;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: TextField(
+                    controller: location,
+                    keyboardType: TextInputType.emailAddress,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      hintText: 'Enter home address',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                    ),
+                    onChanged: (val) {
+                      // username = val;
+                    },
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                       onPressed: () async {
                         if (_time == 'Not Set' || _date == 'Not Set') {
                           showToast("Select date and time", Colors.red);
                         } else {
-                          showDialog(
-                              context: context, builder: (_) => loader());
-                          var pref = await SharedPreferences.getInstance();
-                          print("PREFS $pref");
-                          String str = pref.getString(SPS.user.toString());
-                          print("USER STR $str");
-                          MyUser user = MyUser.fromJson(json.decode(str));
-                          print("USER $user");
-                          if (user.email == "" || user.email == null) {
-                            Navigator.pop(context);
+                          if (name.text == '' ||
+                              phone.text == '' ||
+                              location.text == '') {
                             showToast(
-                                "Kindly add your email from profile settings",
-                                Colors.red);
+                                "Please complete the details", Colors.red);
                           } else {
-                            bool avail = true;
-                            var nowTime = _time.split(' ')[0];
-                            var nowDateStr = _date;
-                            // print("CHECKING $nowDateStr $nowTime");
-                            BookingList books =
-                                await ApiController.getBookings();
-                            for (var bookObj in books.records) {
-                              if (bookObj.date == nowDateStr) {
-                                if (bookObj.time.contains(nowTime))
-                                  avail = false;
-                              }
-                            }
-                            if (avail) {
-                              // showToast("Redirecting", Colors.green);
-                              int finalTotal = (promoBool
-                                      ? (serviceSelected == 'Home'
-                                          ? total - promoPrice + 70
-                                          : total - promoPrice)
-                                      : (serviceSelected == 'Home'
-                                          ? total + 70
-                                          : total))
-                                  .toInt();
-                              double sendingPrice = finalTotal.toDouble();
-                              // try {
-                              //   var response =
-                              //       await http.get(Uri.parse(exchangeAPI));
-                              //   if (response.statusCode == 200 ||
-                              //       response.statusCode == 201) {
-                              //     double rate = json
-                              //         .decode(response.body)["conversion_rate"];
-                              //     sendingPrice = sendingPrice * rate;
-                              //   } else {
-                              //     showToast(
-                              //         "Could not get AED to USD conversion rate",
-                              //         Colors.red);
-                              //   }
-                              // } catch (e) {
-                              //   showToast(
-                              //       "Could not get AED to USD conversion rate",
-                              //       Colors.red);
-                              //   print("RESPONSE ERROR");
-                              //   print(e);
-                              // }
-                              // bool payedPrice = await Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (_) => PaymentScreen(
-                              //               price: sendingPrice,
-                              //               email: user.email,
-                              //             )));
-                              // bool payedPrice = true;
-                              // if (payedPrice != null && payedPrice == true) {
-                              Booking booking = Booking(
-                                  status: "",
-                                  userEmail:
-                                      user.email == '' || user.email == null
-                                          ? 'someone@gmail.com'
-                                          : user.email,
-                                  firestoreId: user.uid,
-                                  description: widget.desc,
-                                  date: _date,
-                                  time: _time.split(" ")[0],
-                                  service: serviceSelected,
-                                  token: user.pushToken,
-                                  total: finalTotal);
-                              print("BOOKING ${booking.toJson()}");
-                              bool book = await ApiController.postBooking(
-                                  booking: booking);
-                              print("BOOKED $book");
-                              if (book != null && book == true) {
-                                await BlocProvider.of<CartCubit>(context)
-                                    .emptyCart();
-                                String bookingText =
-                                    'Following are selected Services\n'
-                                    '${widget.desc}\n'
-                                    'Total charges: $total\n\n'
-                                    'Thank you !!';
-
-                                final message = Message()
-                                  ..from = Address(username, 'Elive')
-                                  ..recipients.add(user.email)
-                                  ..subject = 'Booking Confirmed'
-                                  ..text = '$bookingText'
-                                  ..html = "<h1>Support</h1>\n<p>Hey! ${user.email} you have "
-                                      "a booking on $_date at $_time with following details</p>\n"
-                                      "<p><h3>Following are selected Services</h3>\n</p>"
-                                      "<p>${widget.desc}\n</p>"
-                                      "<p><h3>Total charges: $total</h3>\n\n</p>"
-                                      "<p>Thank you !!</p>";
-                                try {
-                                  final sendReport =
-                                      await send(message, smtpServer);
-                                  //print('Message sent: ' + sendReport.toString());
-                                  showToast("Email Sent", Colors.green);
-                                  print("@EMAIL SENT");
-                                } on MailerException catch (e) {
-                                  //print('Message not sent.');
-                                  for (var p in e.problems) {
-                                    //print('Problem: ${p.code}: ${p.msg}');
-                                  }
+                            showDialog(
+                                context: context, builder: (_) => loader());
+                            var pref = await SharedPreferences.getInstance();
+                            print("PREFS $pref");
+                            String str = pref.getString(SPS.user.toString());
+                            print("USER STR $str");
+                            MyUser user = MyUser.fromJson(json.decode(str));
+                            print("USER $user");
+                            if (user.email == "" || user.email == null) {
+                              Navigator.pop(context);
+                              showToast(
+                                  "Kindly add your email from profile settings",
+                                  Colors.red);
+                            } else {
+                              bool avail = true;
+                              var nowTime = _time.split(' ')[0];
+                              var nowDateStr = _date;
+                              // print("CHECKING $nowDateStr $nowTime");
+                              BookingList books =
+                                  await ApiController.getBookings();
+                              for (var bookObj in books.records) {
+                                if (bookObj.date == nowDateStr) {
+                                  if (bookObj.time.contains(nowTime))
+                                    avail = false;
                                 }
+                              }
+                              if (avail) {
+                                // showToast("Redirecting", Colors.green);
+                                int finalTotal = (promoBool
+                                        ? (serviceSelected == 'Home'
+                                            ? total - promoPrice + 70
+                                            : total - promoPrice)
+                                        : (serviceSelected == 'Home'
+                                            ? total + 70
+                                            : total))
+                                    .toInt();
+                                double sendingPrice = finalTotal.toDouble();
+                                // try {
+                                //   var response =
+                                //       await http.get(Uri.parse(exchangeAPI));
+                                //   if (response.statusCode == 200 ||
+                                //       response.statusCode == 201) {
+                                //     double rate = json
+                                //         .decode(response.body)["conversion_rate"];
+                                //     sendingPrice = sendingPrice * rate;
+                                //   } else {
+                                //     showToast(
+                                //         "Could not get AED to USD conversion rate",
+                                //         Colors.red);
+                                //   }
+                                // } catch (e) {
+                                //   showToast(
+                                //       "Could not get AED to USD conversion rate",
+                                //       Colors.red);
+                                //   print("RESPONSE ERROR");
+                                //   print(e);
+                                // }
+                                // bool payedPrice = await Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (_) => PaymentScreen(
+                                //               price: sendingPrice,
+                                //               email: user.email,
+                                //             )));
+                                // bool payedPrice = true;
+                                // if (payedPrice != null && payedPrice == true) {
+                                Booking booking = Booking(
+                                    status: "",
+                                    userEmail:
+                                        user.email == '' || user.email == null
+                                            ? 'someone@gmail.com'
+                                            : user.email,
+                                    firestoreId: user.uid,
+                                    description: widget.desc,
+                                    date: _date,
+                                    time: _time.split(" ")[0],
+                                    service: serviceSelected,
+                                    token: user.pushToken,
+                                    total: finalTotal);
+                                print("BOOKING ${booking.toJson()}");
+                                bool book = await ApiController.postBooking(
+                                    booking: booking,
+                                    name: name.text,
+                                    phone: phone.text,
+                                    address: location.text);
+                                print("BOOKED $book");
+                                if (book != null && book == true) {
+                                  await BlocProvider.of<CartCubit>(context)
+                                      .emptyCart();
+                                  String bookingText =
+                                      'Following are selected Services\n'
+                                      '${widget.desc}\n'
+                                      'Total charges: $total\n\n'
+                                      'Thank you !!';
 
-                                if (_time.contains("AM")) {
-                                  var str = _time.split(" ")[0];
-                                  List<String> t = str.split(":");
-                                  int hour = int.parse(t[0]);
-                                  int min = int.parse(t[1]);
-                                  var schedule = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      hour - 1,
-                                      min);
-                                  print("NOTIFICATION TIME $schedule");
-                                  await controller.showScheduleNotification(
-                                      'Booking Reminder',
-                                      'You have a booking on $_date at $_time',
-                                      dateTime: schedule);
-                                } else {
-                                  if (_time.contains("12")) {
+                                  final message = Message()
+                                    ..from = Address(username, 'Elive')
+                                    ..recipients.add(user.email)
+                                    ..subject = 'Booking Confirmed'
+                                    ..text = '$bookingText'
+                                    ..html = "<h1>Support</h1>\n<p>Hey! ${user.email} you have "
+                                        "a booking on $_date at $_time with following details</p>\n"
+                                        "<p><h3>Following are selected Services</h3>\n</p>"
+                                        "<p>${widget.desc}\n</p>"
+                                        "<p><h3>Total charges: $total</h3>\n\n</p>"
+                                        "<p>Thank you !!</p>";
+                                  try {
+                                    final sendReport =
+                                        await send(message, smtpServer);
+                                    //print('Message sent: ' + sendReport.toString());
+                                    showToast("Email Sent", Colors.green);
+                                    print("@EMAIL SENT");
+                                  } on MailerException catch (e) {
+                                    //print('Message not sent.');
+                                    for (var p in e.problems) {
+                                      //print('Problem: ${p.code}: ${p.msg}');
+                                    }
+                                  }
+
+                                  if (_time.contains("AM")) {
                                     var str = _time.split(" ")[0];
                                     List<String> t = str.split(":");
                                     int hour = int.parse(t[0]);
-                                    int min = int.parse(t[1]);
-                                    var schedule = DateTime(
-                                        selectedDate.year,
-                                        selectedDate.month,
-                                        selectedDate.day,
-                                        12,
-                                        min);
-                                    print("NOTIFICATION TIME $schedule");
-                                    await controller.showScheduleNotification(
-                                        'Booking Reminder',
-                                        'You have a booking on $_date at $_time',
-                                        dateTime: schedule);
-                                  } else {
-                                    var str = _time.split(" ")[0];
-                                    List<String> t = str.split(":");
-                                    int hour = int.parse(t[0]) + 12;
                                     int min = int.parse(t[1]);
                                     var schedule = DateTime(
                                         selectedDate.year,
@@ -680,25 +739,59 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                         'Booking Reminder',
                                         'You have a booking on $_date at $_time',
                                         dateTime: schedule);
+                                  } else {
+                                    if (_time.contains("12")) {
+                                      var str = _time.split(" ")[0];
+                                      List<String> t = str.split(":");
+                                      int hour = int.parse(t[0]);
+                                      int min = int.parse(t[1]);
+                                      var schedule = DateTime(
+                                          selectedDate.year,
+                                          selectedDate.month,
+                                          selectedDate.day,
+                                          12,
+                                          min);
+                                      print("NOTIFICATION TIME $schedule");
+                                      await controller.showScheduleNotification(
+                                          'Booking Reminder',
+                                          'You have a booking on $_date at $_time',
+                                          dateTime: schedule);
+                                    } else {
+                                      var str = _time.split(" ")[0];
+                                      List<String> t = str.split(":");
+                                      int hour = int.parse(t[0]) + 12;
+                                      int min = int.parse(t[1]);
+                                      var schedule = DateTime(
+                                          selectedDate.year,
+                                          selectedDate.month,
+                                          selectedDate.day,
+                                          hour - 1,
+                                          min);
+                                      print("NOTIFICATION TIME $schedule");
+                                      await controller.showScheduleNotification(
+                                          'Booking Reminder',
+                                          'You have a booking on $_date at $_time',
+                                          dateTime: schedule);
+                                    }
                                   }
+                                  // print("EMPTY CART");
+                                  Navigator.pop(context);
+                                  Navigator.pop(context, true);
+                                  showToast("Booked", Colors.green);
+                                  // showToast(
+                                  //     "Awaiting Confirmation", Colors.green);
+                                } else {
+                                  Navigator.pop(context);
+                                  showToast("Not Booked", Colors.red);
                                 }
-                                // print("EMPTY CART");
-                                Navigator.pop(context);
-                                Navigator.pop(context, true);
-                                showToast("Booked", Colors.green);
-                                // showToast(
-                                //     "Awaiting Confirmation", Colors.green);
+                                // } else {
+                                //   showToast("Payment Failed", Colors.red);
+                                //   Navigator.pop(context);
+                                // }
                               } else {
                                 Navigator.pop(context);
-                                showToast("Not Booked", Colors.red);
+                                showToast("Time not available", Colors.red);
                               }
-                              // } else {
-                              //   showToast("Payment Failed", Colors.red);
-                              //   Navigator.pop(context);
-                              // }
-                            } else {
-                              Navigator.pop(context);
-                              showToast("Time not available", Colors.red);
                             }
                           }
                         }

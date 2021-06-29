@@ -1,3 +1,4 @@
+import 'package:elive/controllers/cartController.dart';
 import 'package:elive/screens/bookingScreen.dart';
 import 'package:elive/screens/cartScreen.dart';
 import 'package:elive/screens/homeScreen.dart';
@@ -35,7 +36,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
       HomeScreen(),
       BlocProvider<BookingCubit>(
           create: (context) => BookingCubit(), child: BookingScreen()),
-      CartScreen(),
+      BlocProvider<CartCubit>(
+          create: (context) => CartCubit(cartRepository: CartRepositoryImpl()),
+          child: CartScreen()),
     ];
     return Scaffold(
       body: Center(

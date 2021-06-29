@@ -126,7 +126,8 @@ class ApiController {
     }
   }
 
-  static Future<bool> postBooking({Booking booking}) async {
+  static Future<bool> postBooking(
+      {Booking booking, name, phone, address}) async {
     try {
       var response = await http.post(Uri.parse(baseURL + "/create.php"),
           body: json.encode({
@@ -138,7 +139,11 @@ class ApiController {
             "service": "${booking.service}",
             "total": booking.total.toString(),
             "status": "Awaiting Confirmation",
-            "token": "${booking.token}"
+            "token": "${booking.token}",
+            "notification": "true",
+            "name": name,
+            "address": address,
+            "phone": phone
           }));
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("RESPONSE 200");

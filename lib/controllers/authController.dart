@@ -54,7 +54,7 @@ class Authenticate {
   Future<MyUser> signUpWithPhoneCredentials(
       {code, phoneVerificationID, name, dob}) async {
     try {
-      db.userCollection.get();
+      // db.userCollection.get();
       PhoneAuthCredential cred = PhoneAuthProvider.credential(
           verificationId: phoneVerificationID, smsCode: code);
 

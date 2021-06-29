@@ -116,7 +116,7 @@ class _SignUpPhoneScreenState extends State<SignUpPhoneScreen> {
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
                   child: TextField(
                     controller: phone,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.number,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
                       suffixIcon: InkWell(
